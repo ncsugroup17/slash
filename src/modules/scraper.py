@@ -377,6 +377,8 @@ def searchEbay(query, df_flag, currency):
 
     return products
 
+import requests
+
 def searchTarget(query, df_flag, currency):
     """
     The searchTarget function scrapes https://www.target.com/
@@ -410,10 +412,28 @@ def searchTarget(query, df_flag, currency):
         'Upgrade-Insecure-Requests': '1',
         'Cache-Control': 'no-cache'
     }
-    data = requests.get(api_url, headers=headers, params=params).json()
+
+    # Make the request
+    response = requests.get(api_url, headers=headers, params=params)
+
+    # Check if the request was successful
+    if response.status_code != 200:
+        print(f"Error: Received status code {response.status_code} from {api_url}")
+        print(f"Response content: {response.text}")  # Log the response content for debugging
+        return []
+
+    # Try to parse the response as JSON
+    try:
+        data = response.json()
+    except requests.exceptions.JSONDecodeError:
+        print(f"Error: Unable to parse JSON response from {api_url}")
+        print(f"Response content: {response.text}")  # Log the response content for debugging
+        return []
+
+    # Process the data and build the product list
     products = []
 
-    for p in data['data']['search']['products']:
+    for p in data.get('data', {}).get('search', {}).get('products', []):
         titles = p['item']['product_description']['title']
         prices = '$' + str(p['price']['reg_retail'])
         links = p['item']['enrichment']['buy_url']
@@ -443,6 +463,7 @@ def searchTarget(query, df_flag, currency):
         products.append(product)
 
     return products
+
 
 def searchBestbuy(query, df_flag, currency):
     """

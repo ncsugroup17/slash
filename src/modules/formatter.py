@@ -22,7 +22,7 @@ EXCHANGES = literal_eval(requests.get(CURRENCY_URL).text)
 
 
 def formatResult(
-    website, titles, prices, links, ratings, num_ratings, trending, df_flag, currency, img_link = None, 
+    website, titles, prices, links, ratings, num_ratings, trending, df_flag, currency, img_link=None
 ):
     """
     The formatResult function takes the scraped HTML as input, and extracts the
@@ -33,7 +33,7 @@ def formatResult(
     ratings-scraped ratings of the product
     Returns: A dictionary of all the parameters stated above for the product
     """
-    
+
     title, price, link, rating, num_rating, converted_cur, trending_stmt = (
         "",
         "",
@@ -43,20 +43,24 @@ def formatResult(
         "",
         "",
     )
-    if website!='ebay' and website!='target':
+    
+    if website != 'ebay' and website != 'target':
         if titles:
-            if website =="bjs":
-                title = titles.get_text().strip()
-            else:
-                title = titles[0].get_text().strip()
+            title = titles[0].get_text().strip() if isinstance(titles, list) else titles.strip()
+        
         if prices:
             price = prices[0].get_text().strip()
-            price = re.sub('\s', '', price) # remove all spaces
-            price = re.sub(',', '', price) # remove all , in numbers
-            price = re.search("[0-9\.]+", price).group() # search and match the price value (numbers)
-            price = "$" + price
-            if(website == 'walmart' and '.' not in price):
-                price = price[:-2] + "." + price[-2:]
+            price = re.sub(r'\s', '', price)  # remove all spaces
+            price = re.sub(',', '', price)     # remove all commas in numbers
+
+            # Safely extract numeric price value
+            price_match = re.search(r"[0-9\.]+", price)
+            if price_match:
+                price = "$" + price_match.group()
+                if website == 'walmart' and '.' not in price:
+                    price = price[:-2] + "." + price[-2:]
+            else:
+                price = "Price not available"  # Handle cases where no price is found
         
         if links:
             link = links[0]["href"]
@@ -66,16 +70,14 @@ def formatResult(
                 try:
                     rating_text = ratings[0].get_text().strip()
                     match = re.search(r"Rating (\d+\.\d+) out of 5 stars", rating_text)
-                    rating = float(match.group(1))
+                    rating = float(match.group(1)) if match else None
                 except:
                     rating = None
-
-            elif(type(ratings)!=str):
+            elif type(ratings) != str:
                 rating = float(ratings[0].get_text().strip().split()[0])
-                
             else:
-                rating=float(ratings)
-            
+                rating = float(ratings)
+        
         if trending:
             trending_stmt = trending.get_text().strip()
         
@@ -83,38 +85,28 @@ def formatResult(
             if isinstance(num_ratings, int):
                 num_rating = num_ratings
             elif isinstance(num_ratings, str):
-                num_ratings = (
-                        num_ratings
-                        .replace(")", "")
-                        .replace("(", "")
-                        .replace(",", "")
-                    )
-                num_rating = num_ratings.strip()
+                num_rating = num_ratings.replace(")", "").replace("(", "").replace(",", "").strip()
             else:
-                num_ratings = (
-                    num_ratings[0]
-                    .get_text()
-                    .replace(")", "")
-                    .replace("(", "")
-                    .replace(",", "")
-                )
-                num_rating = num_ratings.strip()
+                num_ratings = num_ratings[0].get_text().replace(")", "").replace("(", "").replace(",", "").strip()
+                num_rating = num_ratings
+        
         if currency:
             converted_cur = getCurrency(currency, price)
-
+        
         if type(img_link) is not str and img_link:
             img_link = img_link[0].get('src')
+        
         product = {
-        "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        "title": title,
-        "price": price,
-        "img_link":img_link if img_link else "https://odoo-community.org/web/image/product.product/19823/image_1024/Default%20Product%20Images?unique=638e17b",
-        "link": f"{link}" if link.startswith('http') or link.startswith('https') else f"www.{website}.com{link}",
-        "website": website,
-        "rating": rating,
-        "no_of_ratings": num_rating,
-        "trending": trending_stmt,
-        "converted_price": converted_cur,
+            "timestamp": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            "title": title,
+            "price": price,
+            "img_link": img_link if img_link else "https://odoo-community.org/web/image/product.product/19823/image_1024/Default%20Product%20Images?unique=638e17b",
+            "link": f"{link}" if link.startswith('http') or link.startswith('https') else f"www.{website}.com{link}",
+            "website": website,
+            "rating": rating,
+            "no_of_ratings": num_rating,
+            "trending": trending_stmt,
+            "converted_price": converted_cur,
         }
     else:
         if currency:
@@ -124,7 +116,7 @@ def formatResult(
             "title": titles,
             "price": prices,
             "link": links,
-            "img_link":img_link if img_link else "https://avatars.githubusercontent.com/u/56881419",
+            "img_link": img_link if img_link else "https://avatars.githubusercontent.com/u/56881419",
             "website": website,
             "rating": ratings,
             "no_of_ratings": num_ratings,
