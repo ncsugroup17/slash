@@ -18,16 +18,34 @@ html {
     height: 100%;
     
 }
+
 .loginbuttondiv{
-    display: flex;
-flex-direction: row;
+ 
+
+display: flex;
 justify-content: center;
-align-items: flex-start;
 margin-bottom: 10px;
-height: 100vh;
-gap: 20px;
 padding-top: 10vh;
+height: 100vh;
+gap: 10px;
 }
+
+button {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+
+
 .lbutton{
         background-color: transparent; 
         color: rgb(15, 13, 13);             
