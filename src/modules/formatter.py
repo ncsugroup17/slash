@@ -229,9 +229,17 @@ def formatResult(website, titles, prices, links, ratings, num_ratings, trending,
     )
     
     if website != 'ebay' and website != 'target':
-        # Extract and format title
-        title = titles[0].get_text().strip() if isinstance(titles, list) else titles.strip() if titles else ""
-        
+        # # Extract and format title
+        # title = titles[0].get_text().strip() if isinstance(titles, list) else titles.strip() if titles else ""
+        if website != 'ebay' and website != 'target':
+            # Extract and format title
+            if titles and isinstance(titles, list) and titles:
+                title = titles[0].get_text().strip()
+            elif isinstance(titles, str):
+                title = titles.strip()
+            else:
+                title = "Title not available"  # Default message if title is missing
+
         # Extract and format price
         if prices:
             price = prices[0].get_text().strip()

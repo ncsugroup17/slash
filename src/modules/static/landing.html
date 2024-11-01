@@ -5,7 +5,7 @@ Licensed under the MIT License.
 See the LICENSE file in the project root for the full license information.
 -->
 
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -21,8 +21,8 @@ See the LICENSE file in the project root for the full license information.
 <body>
 
   <header class="bgimg-1 w3-display-container w3-grayscale-min" id="home" >
-    <!-- <div class="w3-display-left w3-text-white" style="padding:48px"> -->
-      <div class="loginbuttondiv" >
+    <!-- <div class="w3-display-left w3-text-white" style="padding:48px">  -->
+      <div class="loginbuttondiv" > 
       <!-- <span class="w3-jumbo w3-hide-small">SLASH</span><br> -->
       <!-- <span class="w3-xxlarge w3-hide-large w3-hide-medium">Start something that matters</span><br> -->
       <!-- <span class="title">"Elevating Your Shopping Experience, All you need is One Comparison."</span> -->
@@ -138,9 +138,9 @@ function myfunction(){
   </div>
 </body>
 
-</html> -->
+</html> 
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -152,19 +152,19 @@ function myfunction(){
   <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
 </head>
 
-<body>
+<body> -->
 
   <!-- Header Section -->
-  <header id="home" class="bgimg-1 w3-display-container w3-grayscale-min">
+  <!-- <header id="home" class="bgimg-1 w3-display-container w3-grayscale-min">
     <div class="w3-display-left w3-text-white" style="padding:48px">
       <span class="w3-jumbo w3-hide-small">SLASH</span><br>
       <span class="w3-xxlarge w3-hide-large w3-hide-medium">Start something that matters</span><br>
       <span class="w3-large">"Elevating Your Shopping Experience, All you need is One Comparison."</span>
       <p><a onclick="document.getElementById('id01').style.display='block'" class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">Log In</a></p>
-    </div>
+    </div> -->
 
     <!-- Login Status and Options -->
-    <div class="w3-display-bottomleft w3-padding-large">
+    <!-- <div class="w3-display-bottomleft w3-padding-large">
       {% if login %}
         <p>Welcome, {{ session['username'] }}!</p>
         <a href="{{ url_for('logout') }}" class="w3-button w3-red">Logout</a>
@@ -176,10 +176,10 @@ function myfunction(){
           <button class="w3-button w3-black">Traditional Login</button>
         </a>
       {% endif %}
-    </div>
+    </div> -->
 
     <!-- Invalid Login Popup -->
-    {% if invalid %}
+    <!-- {% if invalid %}
       <div id="errorPopup" class="w3-modal" style="display:block;">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
           <div class="w3-center"><br>
@@ -189,10 +189,10 @@ function myfunction(){
         </div>
       </div>
     {% endif %}
-  </header>
+  </header> -->
 
   <!-- Traditional Login Modal -->
-  <div id="id01" class="w3-modal">
+  <!-- <div id="id01" class="w3-modal">
     <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
       <div class="w3-center"><br>
         <span onclick="document.getElementById('id01').style.display='none'" class="w3-button w3-xlarge w3-transparent w3-display-topright" title="Close Modal">×</span>
@@ -208,10 +208,10 @@ function myfunction(){
         </div>
       </form>
     </div>
-  </div>
+  </div> -->
 
   <!-- Register Modal -->
-  <div id="id02" class="w3-modal">
+  <!-- <div id="id02" class="w3-modal">
     <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
       <div class="w3-center"><br>
         <span onclick="document.getElementById('id02').style.display='none'" class="w3-button w3-xlarge w3-transparent w3-display-topright" title="Close Modal">×</span>
@@ -230,4 +230,4 @@ function myfunction(){
   </div>
 
 </body>
-</html>
+</html> -->
