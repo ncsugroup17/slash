@@ -1,26 +1,45 @@
-"""
-Copyright (C) 2023 SE23-Team44
- 
-Licensed under the MIT License.
-See the LICENSE file in the project root for the full license information.
-"""
-
 import csv
-from datetime import datetime
 import os
 
+class CSVWriter:
+    def __init__(self, filename='comments.csv'):
+        self.filename = filename
+        # Ensure the CSV file has headers if it doesn’t exist
+        if not os.path.exists(self.filename):
+            with open(self.filename, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(['product_id', 'username', 'comment'])  # Column headers
 
-def write_csv(arr,product,file_path):
-	''' Returns the CSV file with the naming nomenclature as 'ProductDate_Time'
-        Parameters- product: product entered by the user, file_path: path where the csv needs to be stored
-        Returns- file_name: CSV file '''
-	os.chdir(file_path)
-	keys = arr[0].keys()
-	now=datetime.now()
-	file_name=product+now.strftime("%m%d%y_%H%M")+'.csv'
-	a_file = open(file_name, "w", newline='')
-	dict_writer = csv.DictWriter(a_file, keys)
-	dict_writer.writeheader()
-	dict_writer.writerows(arr)
-	a_file.close()
-	return file_name
+    def add_comment(self, product_id, username, comment):
+        """
+        Adds a new comment to the CSV file.
+
+        Args:
+            product_id (str): The unique ID of the product.
+            username (str): The username of the commenter.
+            comment (str): The comment text.
+        """
+        with open(self.filename, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([product_id, username, comment])
+
+    def get_comments(self, product_id):
+        """
+        Retrieves all comments for a specific product.
+
+        Args:
+            product_id (str): The unique ID of the product.
+
+        Returns:
+            list: A list of dictionaries containing comments for the product.
+        """
+        comments = []
+        with open(self.filename, mode='r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['product_id'] == product_id:
+                    comments.append({
+                        'username': row['username'],
+                        'comment': row['comment']
+                    })
+        return comments

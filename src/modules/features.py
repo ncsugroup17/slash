@@ -261,21 +261,26 @@ def check_user(email, password=None):
     cred_file = usr_dir(email) / "cred.csv"
     return cred_file.exists()
 
-# Function to add a new item to the user's wishlist
 def wishlist_add_item(email, wishlist_name, item_data):
     wishlist_path = usr_dir(email) / f"{wishlist_name}.csv"
+    print(f"Adding item to wishlist at: {wishlist_path}")  # Debug statement
+    
     if isinstance(item_data, dict):
         item_data = pd.DataFrame([item_data])
-
+    
     # Load existing data if wishlist file exists, else create new
     if wishlist_path.exists() and wishlist_path.stat().st_size > 0:
         old_data = pd.read_csv(wishlist_path)
+        print("Existing wishlist data found")  # Debug statement
     else:
         old_data = pd.DataFrame()
+        print("No existing data, creating new wishlist file")  # Debug statement
 
     # Append new item data and save
     final_data = pd.concat([old_data, item_data])
     final_data.to_csv(wishlist_path, index=False, header=item_data.columns)
+    print("Item added to wishlist and saved.")  # Debug statement
+
 
 # Read items from a user's wishlist
 def read_wishlist(email, wishlist_name):

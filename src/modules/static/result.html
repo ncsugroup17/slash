@@ -1,10 +1,3 @@
-<!--
-Copyright (C) 2023 SE23-Team44
-
-Licensed under the MIT License.
-See the LICENSE file in the project root for the full license information.
--->
-
 <!doctype html>
 <html lang="en">
 
@@ -75,6 +68,7 @@ See the LICENSE file in the project root for the full license information.
     </div>
     <br><br><br><br> <br><br><br><br>
   </div>
+
   <div class="container" id="abc">
     <div class="row gx-3 align-items-end">
       <div class="col-sm">
@@ -124,257 +118,114 @@ See the LICENSE file in the project root for the full license information.
     </div>
     <hr>
   </div>
-  <br>
-  <script>
-    var a = []
-  </script>
-  {% for product in data %}
-  <script>
-    var jsonData = '{{ product | tojson | safe }}';
-    try {
-      j = JSON.parse(jsonData)
-      a.push(j)
-    } catch (error) {
 
-    }
-  </script>
-  {% endfor %}
-  <div class="grid">
+  <div class="container">
+    <div class="grid">
+      {% for product in data %}
+      <div class="card-wrapper">
+        <div class="card-img-holder">
+          <img class="card-img" src="{{ product.img_link }}" alt="Product Image">
+        </div>
+        <div class="card-content">
+          <span class="card-website">{{ product.website }}</span>
+          <h4 class="card-price">{{ product.price }}</h4>
+          <p class="card-title">{{ product.title }}</p>
+          <div class="card-bottom">
+            <div class="card-rating">Rating: {{ product.rating }}</div>
+            <div class="card-buttons">
+              <a href="{{ product.link }}" target="_blank"><i class="fa fa-link"></i></a>
+              <a href="#/" id="heart-link"><i class="fa fa-heart"></i></a>
+              <!-- Button to open the comment popup -->
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#commentModal{{ loop.index }}">
+                Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comment Modal for each product -->
+      <div class="modal fade" id="commentModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel{{ loop.index }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="commentModalLabel{{ loop.index }}">Comments for {{ product.title }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <!-- Display Existing Comments -->
+              {% if comments[product.title] %}
+                <h6>Previous Comments:</h6>
+                <ul>
+                  {% for comment in comments[product.title] %}
+                  <li><strong>{{ comment.username }}:</strong> {{ comment.comment }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p>No comments yet.</p>
+              {% endif %}
+
+              <!-- Add New Comment Form -->
+              <form action="/add_comment" method="POST">
+                <input type="hidden" name="product_name" value="{{ product.title }}">
+                <div class="form-group">
+                  <label for="comment">Your Comment:</label>
+                  <textarea class="form-control" id="comment" name="comment" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Comment</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 
-  <!-- pagination links section-->
+  <!-- Pagination Links Section -->
   <div class="pagination-container">
     {% for page_num in range(1, total_pages + 1) %}
     <a href="#" class="pagination-link" data-page="{{ page_num }}">{{ page_num }}</a>
     {% endfor %}
   </div>
 
-  <script>
-    function getTemplate() {
-      return tempelate = `
-     <div class="card-img-holder">
-         <img class="card-img" src="">
-     </div>
-     <div class="card-content">
-         <span class="card-website"></span>
-         <h4 class="card-price"></h4>
-         <p class="card-title"></p>
-         <div class="card-bottom">
-             <div class="card-rating">Rating:</div>
-             <div class="card-buttons">
-                 <a href="" target="_blank"><i class="fa fa-link"></i></a>
-                 <a href="#/" id="heart-link"><i class="fa fa-heart"></i></a>
-             </div>
-         </div>
-     </div>`;
-    }
-
-    // Pagination logic
-    var itemsPerPage = 20;
-    var totalPages = Math.ceil(a.length / itemsPerPage);
-    var currentPage = 1;
-    var grid = document.querySelector(".grid")
-    // Function to find the cheapest product in the data array
-    function findCheapestProduct() {
-      if (a.length === 0) {
-        return null;
-      }
-
-      let cheapestProduct = a[0];
-      for (let i = 1; i < a.length; i++) {
-        const currentPrice = parseFloat(a[i].price.replace('$', '').replace(',', ''));
-        const cheapestPrice = parseFloat(cheapestProduct.price.replace('$', '').replace(',', ''));
-
-        if (currentPrice < cheapestPrice) {
-          cheapestProduct = a[i];
-        }
-      }
-
-      return cheapestProduct;
-    }
-
-    // Function to display the cheapest product in a separate div
-    function displayCheapestProduct() {
-      let cheapestProduct = findCheapestProduct();
-
-      if (cheapestProduct) {
-        let template = getTemplate();
-        let wrapper = document.createElement("div");
-        wrapper.setAttribute("class", "card-wrapper cheapest-product");
-
-        // Populate template with data for the cheapest product
-        template = template.replace('<img class="card-img" src="">', `<img class="card-img" src="${cheapestProduct.img_link}">`);
-        template = template.replace('<span class="card-website"></span>', `<span class="card-website">Cheapest Product:${cheapestProduct.website}</span>`);
-        template = template.replace('<h4 class="card-price"></h4>', `<h4 class="card-price">${cheapestProduct.price}</h4>`);
-        template = template.replace('<p class="card-title"></p>', `<p class="card-title">${cheapestProduct.title}</p>`);
-        template = template.replace('Rating:</div>', `Rating: ${cheapestProduct.rating}</div>`);
-        template = template.replace('<a href="" target="_blank"><i class="fa fa-link"></i></a>', `<a href="${cheapestProduct.link}" target="_blank"><i class="fa fa-link"></i></a>`);
-        // template = template.replace('<a href="#/" id="heart-link"><i class="fa fa-heart"></i></a>', '');
-
-
-        wrapper.innerHTML = template;
-
-        wrapper.querySelector("#heart-link").addEventListener("click", function (e) {
-          e.preventDefault();
-          addToCart(wrapper, cheapestProduct, e);
-        })
-
-        // Create a new div for the cheapest product and append the card to it
-        let cheapestProductDiv = document.createElement("div");
-        cheapestProductDiv.setAttribute("class", "cheapest-product-container");
-        cheapestProductDiv.style.backgroundColor = "green";
-        cheapestProductDiv.appendChild(wrapper);
-
-        // Insert the new div with the cheapest product at the top of the grid
-        grid.insertBefore(cheapestProductDiv, grid.firstChild);
-      }
-    }
-
-    function showPage(page) {
-      var startIndex = (page - 1) * itemsPerPage;
-      var endIndex = startIndex + itemsPerPage;
-      var currentPageData = a.slice(startIndex, endIndex);
-
-      // Clear existing content
-      grid.innerHTML = "";
-
-      displayCheapestProduct();
-
-      // Your existing code to display the products...
-      for (i = 0; i < currentPageData.length; i++) {
-        let tempelate = getTemplate();
-        let wrapper = document.createElement("div");
-        let data = currentPageData[i];
-        wrapper.setAttribute("class", "card-wrapper");
-        wrapper.innerHTML = tempelate;
-        wrapper.querySelector(".card-img").setAttribute("src", currentPageData[i].img_link);
-        wrapper.querySelector(".card-website").innerHTML = currentPageData[i].website;
-        wrapper.querySelector(".card-rating").innerHTML = "Rating: " + currentPageData[i].rating;
-        wrapper.querySelector(".card-buttons").firstElementChild.setAttribute("href", currentPageData[i].link);
-        wrapper.querySelector(".card-title").innerHTML = currentPageData[i].title;
-        wrapper.querySelector(".card-price").innerHTML = currentPageData[i].price;
-        wrapper.querySelector("#heart-link").addEventListener("click", function (e) {
-          e.preventDefault();
-          addToCart(wrapper, data, e);
-        });
-        grid.append(wrapper);
-      }
-
-      // Update pagination links styling
-      document.querySelectorAll(".pagination-link").forEach(function (link) {
-        link.classList.remove("active");
-      });
-      document.querySelector(`.pagination-link[data-page="${page}"]`).classList.add("active");
-    }
-
-    // Show the first page on initial load
-    showPage(currentPage);
-
-    // Handle pagination link clicks
-    document.querySelectorAll(".pagination-link").forEach(function (link) {
-      link.addEventListener("click", function (event) {
-        event.preventDefault();
-        currentPage = parseInt(this.getAttribute("data-page"), 10);
-        showPage(currentPage);
-      });
-    });
-
-  </script>
-  <div class="col-md-4"></div>
-  </div>
-
-  </header>
-
-
-
-  <script type="text/javascript" src="{{ url_for('static', filename='grid.js') }}"></script>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
 
   <script>
-    !function (a) { "use strict"; "function" == typeof define && define.amd ? define(["jquery"], a) : a(jQuery) }(function (a) { "use strict"; function b(a) { if (a instanceof Date) return a; if (String(a).match(g)) return String(a).match(/^[0-9]*$/) && (a = Number(a)), String(a).match(/\-/) && (a = String(a).replace(/\-/g, "/")), new Date(a); throw new Error("Couldn't cast `" + a + "` to a date object.") } function c(a) { var b = a.toString().replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"); return new RegExp(b) } function d(a) { return function (b) { var d = b.match(/%(-|!)?[A-Z]{1}(:[^;]+;)?/gi); if (d) for (var f = 0, g = d.length; f < g; ++f) { var h = d[f].match(/%(-|!)?([a-zA-Z]{1})(:[^;]+;)?/), j = c(h[0]), k = h[1] || "", l = h[3] || "", m = null; h = h[2], i.hasOwnProperty(h) && (m = i[h], m = Number(a[m])), null !== m && ("!" === k && (m = e(l, m)), "" === k && m < 10 && (m = "0" + m.toString()), b = b.replace(j, m.toString())) } return b = b.replace(/%%/, "%") } } function e(a, b) { var c = "s", d = ""; return a && (a = a.replace(/(:|;|\s)/gi, "").split(/\,/), 1 === a.length ? c = a[0] : (d = a[0], c = a[1])), Math.abs(b) > 1 ? c : d } var f = [], g = [], h = { precision: 100, elapse: !1, defer: !1 }; g.push(/^[0-9]*$/.source), g.push(/([0-9]{1,2}\/){2}[0-9]{4}( [0-9]{1,2}(:[0-9]{2}){2})?/.source), g.push(/[0-9]{4}([\/\-][0-9]{1,2}){2}( [0-9]{1,2}(:[0-9]{2}){2})?/.source), g = new RegExp(g.join("|")); var i = { Y: "years", m: "months", n: "daysToMonth", d: "daysToWeek", w: "weeks", W: "weeksToMonth", H: "hours", M: "minutes", S: "seconds", D: "totalDays", I: "totalHours", N: "totalMinutes", T: "totalSeconds" }, j = function (b, c, d) { this.el = b, this.$el = a(b), this.interval = null, this.offset = {}, this.options = a.extend({}, h), this.instanceNumber = f.length, f.push(this), this.$el.data("countdown-instance", this.instanceNumber), d && ("function" == typeof d ? (this.$el.on("update.countdown", d), this.$el.on("stoped.countdown", d), this.$el.on("finish.countdown", d)) : this.options = a.extend({}, h, d)), this.setFinalDate(c), this.options.defer === !1 && this.start() }; a.extend(j.prototype, { start: function () { null !== this.interval && clearInterval(this.interval); var a = this; this.update(), this.interval = setInterval(function () { a.update.call(a) }, this.options.precision) }, stop: function () { clearInterval(this.interval), this.interval = null, this.dispatchEvent("stoped") }, toggle: function () { this.interval ? this.stop() : this.start() }, pause: function () { this.stop() }, resume: function () { this.start() }, remove: function () { this.stop.call(this), f[this.instanceNumber] = null, delete this.$el.data().countdownInstance }, setFinalDate: function (a) { this.finalDate = b(a) }, update: function () { if (0 === this.$el.closest("html").length) return void this.remove(); var b, c = void 0 !== a._data(this.el, "events"), d = new Date; b = this.finalDate.getTime() - d.getTime(), b = Math.ceil(b / 1e3), b = !this.options.elapse && b < 0 ? 0 : Math.abs(b), this.totalSecsLeft !== b && c && (this.totalSecsLeft = b, this.elapsed = d >= this.finalDate, this.offset = { seconds: this.totalSecsLeft % 60, minutes: Math.floor(this.totalSecsLeft / 60) % 60, hours: Math.floor(this.totalSecsLeft / 60 / 60) % 24, days: Math.floor(this.totalSecsLeft / 60 / 60 / 24) % 7, daysToWeek: Math.floor(this.totalSecsLeft / 60 / 60 / 24) % 7, daysToMonth: Math.floor(this.totalSecsLeft / 60 / 60 / 24 % 30.4368), weeks: Math.floor(this.totalSecsLeft / 60 / 60 / 24 / 7), weeksToMonth: Math.floor(this.totalSecsLeft / 60 / 60 / 24 / 7) % 4, months: Math.floor(this.totalSecsLeft / 60 / 60 / 24 / 30.4368), years: Math.abs(this.finalDate.getFullYear() - d.getFullYear()), totalDays: Math.floor(this.totalSecsLeft / 60 / 60 / 24), totalHours: Math.floor(this.totalSecsLeft / 60 / 60), totalMinutes: Math.floor(this.totalSecsLeft / 60), totalSeconds: this.totalSecsLeft }, this.options.elapse || 0 !== this.totalSecsLeft ? this.dispatchEvent("update") : (this.stop(), this.dispatchEvent("finish"))) }, dispatchEvent: function (b) { var c = a.Event(b + ".countdown"); c.finalDate = this.finalDate, c.elapsed = this.elapsed, c.offset = a.extend({}, this.offset), c.strftime = d(this.offset), this.$el.trigger(c) } }), a.fn.countdown = function () { var b = Array.prototype.slice.call(arguments, 0); return this.each(function () { var c = a(this).data("countdown-instance"); if (void 0 !== c) { var d = f[c], e = b[0]; j.prototype.hasOwnProperty(e) ? d[e].apply(d, b.slice(1)) : null === String(e).match(/^[$A-Z_][0-9A-Z_$]*$/i) ? (d.setFinalDate.call(d, e), d.start()) : a.error("Method %s does not exist on jQuery.countdown".replace(/\%s/gi, e)) } else new j(this, b[0], b[1]) }) } });</script>
-  <script>
-    window.onload = function () {
-      if (window.localStorage) {
-        var isDark = window.localStorage.getItem("dark");
-        if (isDark == 'true') {
-          document.body.classList.add("dark-mode");
-          document.getElementById("toggle-button").firstElementChild.checked = true;
-        }
-      }
+    var a = [];
+    {% for product in data %}
+    var jsonData = '{{ product | tojson | safe }}';
+    try {
+      var j = JSON.parse(jsonData);
+      a.push(j);
+    } catch (error) {
+      console.error(error);
     }
+    {% endfor %}
 
-    window.onscroll = function (e) {
-
-      e.preventDefault();
-
-      let scroll = window.scrollY;
-
-      var Scroll = document.querySelector("#efec-scroll");
-      var ulone = document.querySelector("#ulone");
-      var ultwu = document.querySelector("#ultwu");
-      var logo = document.getElementById("logo");
-      var darkModeButton = document.getElementById("toggle-button").firstElementChild;
-
-      if (scroll > 50) {
-        if (darkModeButton.checked) {
-          Scroll.classList.add("bg-menu-light")
-        } else {
-          Scroll.classList.add("bg-menu");
-        }
-        // ulone.classList.add("nav-scroll");
-        // ultwu.classList.add("nav-scroll");
-        // logo.classList.add("logo");
-      } else {
-        Scroll.classList.remove("bg-menu");
-        Scroll.classList.remove("bg-menu-light");
-        // ulone.classList.remove("nav-scroll");
-        // ultwu.classList.remove("nav-scroll");
-        // logo.classList.remove("logo");
-      }
-    };
-  </script>
-  <script>
     function addToCart(heartLink, product_data, e) {
       if (e.target && e.target.classList && !e.target.classList.contains("clicked-heart")) {
         e.target.classList.add("clicked-heart");
       }
       let post_data = new URLSearchParams();
-      // product_data = JSON.parse(product_data)
-      for (k in product_data)
-        post_data.append(k, product_data[k])
-      fetch("/add-wishlist-item", {
-        method: 'post',
-        body: post_data,
-      }).then(result => console.log(result)).catch(error => console.error(error))
+      for (let k in product_data) post_data.append(k, product_data[k]);
+      fetch("/add-wishlist-item", { method: 'post', body: post_data })
+        .then(result => console.log(result))
+        .catch(error => console.error(error));
     }
-    var darkModeButton = document.getElementById("toggle-button");
-    darkModeButton.addEventListener("click", function () {
-      let scroll = window.scrollY;
-      var Scroll = document.querySelector("#efec-scroll");
-      if (darkModeButton.firstElementChild.checked) {
-        document.body.classList.add("dark-mode");
-        window.localStorage.setItem("dark", true);
-        if (scroll > 50) {
-          Scroll.classList.remove("bg-menu");
-          Scroll.classList.add("bg-menu-light");
-        }
-      } else {
-        document.body.classList.remove("dark-mode");
-        window.localStorage.setItem("dark", false);
-        if (scroll > 50) {
-          Scroll.classList.add("bg-menu");
-          Scroll.classList.remove("bg-menu-light");
-        }
-      }
-    })
+
+    document.querySelectorAll(".pagination-link").forEach(function(link) {
+      link.addEventListener("click", function(event) {
+        event.preventDefault();
+        currentPage = parseInt(this.getAttribute("data-page"), 10);
+        showPage(currentPage);
+      });
+    });
   </script>
 </body>
 
