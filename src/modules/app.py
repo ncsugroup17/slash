@@ -5,16 +5,19 @@ Licensed under the MIT License.
 See the LICENSE file in the project root for the full license information.
 """
 
-from flask import Flask, session, render_template, request, redirect, url_for
+
+from flask import Flask, session, render_template, request, redirect, url_for,jsonify
 from .scraper import driver, filter
 from .formatter import formatResult
 import json
+import openai
 from .features import create_user, check_user, wishlist_add_item, read_wishlist, wishlist_remove_list, share_wishlist
 from .config import Config
 
 app = Flask(__name__, template_folder=".")
 
 app.secret_key = Config.SECRET_KEY
+
 
 @app.route('/')
 def landingpage():

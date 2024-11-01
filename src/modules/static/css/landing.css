@@ -16,18 +16,52 @@ h6 {
 body,
 html {
     height: 100%;
-    line-height: 1.8;
+    
+}
+.loginbuttondiv{
+    display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+margin-bottom: 10px;
+height: 100vh;
+gap: 20px;
+padding-top: 10vh;
+}
+.lbutton{
+        background-color: transparent; 
+        color: rgb(15, 13, 13);             
+        padding: 12px 20px;        
+        font-size: 16px;          
+        border: 2px solid rgb(62, 74, 78);              
+        border-radius: 10px;        
+        cursor: pointer;           
+        transition: background-color 0.3s; 
+   
+    
+}
+
+ .lbutton:hover {
+    background-color: #3fbdce; 
+}
+.title{
+    color: whitesmoke;
+    font-size: 2em; /* Adjust size as needed */
+    text-shadow: 0 0 30px #0183fd, 0 0 20px #eff86b, 0 0 30px #000000, 0 0 40px #070707, 0 0 50px #000000, 0 0 60px #000000, 0 0 70px #030303;
 }
 
 .bgimg-1 {
 
-    background-size: cover;
-    background-image: url("https://shots.codepen.io/username/pen/NLLXrv-800.jpg?version=1537117490");
-    min-height: 135%;
+  
+    background-image: url('../images/background_image1.jpg');
+    
+    background-repeat: no-repeat;
+
+    background-size: 100% ;
 }
 
 .w3-bar .w3-button {
-    padding: 16px;
+    padding: 10px;
 }
 
 .popup {

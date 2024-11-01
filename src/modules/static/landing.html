@@ -20,18 +20,22 @@ See the LICENSE file in the project root for the full license information.
 
 <body>
 
-  <header class="bgimg-1 w3-display-container w3-grayscale-min" id="home">
-    <div class="w3-display-left w3-text-white" style="padding:48px">
-      <span class="w3-jumbo w3-hide-small">SLASH</span><br>
-      <span class="w3-xxlarge w3-hide-large w3-hide-medium">Start something that matters</span><br>
-      <span class="w3-large">"Elevating Your Shopping Experience, All you need is One Comparison."</span>
+  <header class="bgimg-1 w3-display-container w3-grayscale-min" id="home" >
+    <!-- <div class="w3-display-left w3-text-white" style="padding:48px"> -->
+      <div class="loginbuttondiv" >
+      <!-- <span class="w3-jumbo w3-hide-small">SLASH</span><br> -->
+      <!-- <span class="w3-xxlarge w3-hide-large w3-hide-medium">Start something that matters</span><br> -->
+      <!-- <span class="title">"Elevating Your Shopping Experience, All you need is One Comparison."</span> -->
       <p><a onclick="document.getElementById('id01').style.display='block'"
-          class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">
+          class="lbutton " >
           Log In</a></p>
-      <p><a onclick="document.getElementById('id02').style.display='block'"
-          class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">
-          Register</a></p>  
+          <br>
+          <p><a onclick="document.getElementById('id02').style.display='block'"
+            class="lbutton">
+            Register</a></p> 
+      
     </div>
+    
 
     {% if invalid %}
 
@@ -48,35 +52,48 @@ See the LICENSE file in the project root for the full license information.
 
   <div id="id01" class="w3-modal">
     <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
-      <div class="w3-center"><br>
+      <div class="w3-center" ><br>
         <span onclick="document.getElementById('id01').style.display='none'"
-          class=" w3-button w3-xlarge w3-transparent w3-display-topright" title="Close Modal">×</span>
+          class=" w3-button w3-xlarge w3-transparent w3-display-topright"  title="Close Modal">×</span>
         <img
-          src="https://www.pngitem.com/pimgs/m/137-1370168_professional-clipart-female-avatar-circle-hd-png-download.png"
-          alt="Avatar" style="width:30%" class="w3-circle w3-margin-top">
+          src="https://abhyasedu.com/img/login.png"
+          alt="Avatar" style="width:50% " class="w3-circle w3-margin-top">
       </div>
       <form class="w3-container" method="POST" action="/login">
         <div class="w3-section">
           <label><b>Username</b></label>
           <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Username" name="username"
             required>
-          <label><b>Password</b></label>
-          <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Password" name="password"
+          <label ><b>Password</b></label>
+          <input class="w3-input w3-border w3-margin-bottom" type="password" id="pass" placeholder="Enter Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}" name="password"
             required>
+            <label>At least min 8 character length,1 uppercase,1 lowercase,1 digit,1 special character </label>
+            <br>
+            <input type="checkbox" onclick="myfunction()">Show Password
           <button class="w3-button w3-block w3-black w3-section w3-padding" type="submit">Login</button>
         </div>
       </form>
     </div>
   </div>
+<script>
+function myfunction(){
+  var x = document.getElementById('pass');
+  if(x.type==="password"){
+    x.type ="text";
+  }else{
+    x.type = "password";
+  }
+}
 
+</script>
   <div id="id02" class="w3-modal">
     <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
       <div class="w3-center"><br>
         <span onclick="document.getElementById('id02').style.display='none'"
           class=" w3-button w3-xlarge w3-transparent w3-display-topright" title="Close Modal">×</span>
         <img
-          src="https://www.pngitem.com/pimgs/m/137-1370168_professional-clipart-female-avatar-circle-hd-png-download.png"
-          alt="Avatar" style="width:30%" class="w3-circle w3-margin-top">
+          src="https://abhyasedu.com/img/login.png"
+          alt="Avatar" style="width:50%" class="w3-circle w3-margin-top">
       </div>
       <form class="w3-container" method="POST" action="/register">
         <div class="w3-section">
@@ -84,11 +101,25 @@ See the LICENSE file in the project root for the full license information.
           <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Username" name="username"
             required>
           <label><b>Password</b></label>
-          <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Password" name="password"
+          <input class="w3-input w3-border w3-margin-bottom" type="password" id ="reg"placeholder="Enter Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}" name="password"
             required>
+            <label>At least min 8 character length,1 uppercase,1 lowercase,1 digit,1 special character </label>
+            <br>
+            <input type="checkbox" onclick="lfunction()">Show Password
           <button class="w3-button w3-block w3-black w3-section w3-padding" type="submit">Register</button>
         </div>
       </form>
+      <script>
+        function lfunction(){
+          var y = document.getElementById('reg');
+          if(y.type==="password"){
+            y.type ="text";
+          }else{
+            y.type = "password";
+          }
+        }
+        
+        </script>
     </div>
   </div>
 

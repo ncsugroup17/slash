@@ -8,6 +8,8 @@ See the LICENSE file in the project root for the full license information.
 <!doctype html>
 <html lang="en">
 
+
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -17,6 +19,9 @@ See the LICENSE file in the project root for the full license information.
   <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
   <title>Searching</title>
 </head>
+
+
+
 
 <body data-spy="scroll" data-target="#efec-scroll" data-offset="10">
   <nav id="efec-scroll" class="navbar navbar-expand-md bg-dark navbar-dark fixed-top bg-transparent">
@@ -34,7 +39,7 @@ See the LICENSE file in the project root for the full license information.
       </ul>
 
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/France.tv_Slash.svg/1423px-France.tv_Slash.svg.png"
+        src="../static/images/logo.png"
         alt="" id="logo" class="" width="5%">
 
       <ul id="ultwu" class="navbar-nav">
@@ -62,26 +67,28 @@ See the LICENSE file in the project root for the full license information.
   <div class="container">
     <div class="conten-title">
       <h2><img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/France.tv_Slash.svg/1423px-France.tv_Slash.svg.png"
+          src="../static/images/logo.png"
           alt="logo" width="3%">
       </h2>
       <section class="webdesigntuts-workshop">
         <form action="/search" method="GET">
           <input type="text" name="product_name" placeholder="What are you looking for?">
-          <button type="submit">Search</button>
+          <button class="searchbutton" type="submit">Search</button>
         </form>
         <br>
       </section>
     </div>
     <br><br><br><br> <br><br><br><br>
   </div>
-  <div class="container" id="abc">
+
+
+  <!-- <div class="container" id="abc">
     <div class="row gx-3 align-items-end">
       <div class="col-sm">
         <form action="/filter?product_name={{prod}}" method="post" id="filter1" class="d-flex justify-content-between">
-          <div class="form-group">
-            <label class="control-label" for="company"></label>
-            <select id="choice1" name="sort" class="form-control">
+          <div class="form-group" >
+            <label class="control-label" for="company" ></label>
+            <select id="choice1" name="sort" class="form-control" style="color: rgb(0, 0, 0);">
               <option value="default">Sort By</option>
               <option value="rades">Rating High to Low</option>
               <option value="raasc">Rating Low to High</option>
@@ -91,7 +98,7 @@ See the LICENSE file in the project root for the full license information.
           </div>
           <div class="form-group">
             <label class="control-label" for="company"></label>
-            <select id="choice1" name="currency" class="form-control">
+            <select id="choice1" name="currency" class="form-control"style="color: rgb(0, 0, 0);">
               <option value="usd">USD</option>
               <option value="inr">INR</option>
               <option value="euro">EURO</option>
@@ -103,27 +110,88 @@ See the LICENSE file in the project root for the full license information.
           <div class="form-group">
             <label class="control-label" for="company"></label>
             <input type="number" step="0.1" min="0" id="amount_min" name="min_rating" placeholder="Min Rating"
-              class="form-control" style="border-radius: 7px; height: 44px;">
+              class="form-control" style="border-radius: 7px; height: 44px;"style="color: rgb(0, 0, 0);">
           </div>
           <div class="form-group">
             <label class="control-label" for="company"></label>
             <input type="number" step="0.01" min="0" id="amount_min" name="min_price" placeholder="Min Price"
-              class="form-control" style="border-radius: 7px; height: 44px;">
+              class="form-control" style="border-radius: 7px; height: 44px;"style="color: rgb(0, 0, 0);">
           </div>
           <div class="form-group">
             <label class="control-label" for="company"></label>
             <input type="number" step="0.01" min="0" id="amount_max" name="max_price" placeholder="Max Price"
-              class="form-control" style="border-radius: 7px; height: 44px;">
+              class="form-control" style="border-radius: 7px; height: 44px;"style="color: rgb(0, 0, 0);">
           </div>
           <div class="form-group">
             <label class="control-label" for="company"></label>
-            <input type="submit" style="border-radius: 7px; height: 34px;" class="button button1" value="Search" />
+            <input type="submit" style="border-radius: 7px; height: 34px;" class="searchbutton" value="Search" />
+          </div>
+        </form>
+      </div>
+    </div>
+    <hr>
+  </div> -->
+
+  <div class="container fixed-form" id="abc">
+    <div class="row gx-3">
+      <div class="col-sm">
+        <form action="/filter?product_name={{prod}}" method="post" id="filter1" class="d-flex flex-column align-items-start">
+          <div class="form-group mb-3">
+            <label class="control-label" for="company"></label>
+            <select id="choice1" name="sort" class="form-control" style="color: rgb(0, 0, 0); width: 135px;">
+              <option value="default">Sort By</option>
+              <option value="rades">Rating High to Low</option>
+              <option value="raasc">Rating Low to High</option>
+              <option value="pasc">Price Low to High</option>
+              <option value="pdes">Price High to Low</option>
+            </select>
+          </div>
+          
+          <div class="form-group mb-3">
+            <label class="control-label" for="company"></label>
+            <select id="choice1" name="currency" class="form-control" style="color: rgb(0, 0, 0); width: 135px;">
+              <option value="usd">USD</option>
+              <option value="inr">INR</option>
+              <option value="euro">EURO</option>
+              <option value="yuan">YUAN</option>
+              <option value="aud">AUD</option>
+              <option value="pound">POUND</option>
+            </select>
+          </div>
+          
+          <div class="form-group mb-3">
+            <label class="control-label" for="company"></label>
+            <input type="number" step="0.1" min="0" id="amount_min" name="min_rating" placeholder="Min Rating"
+              class="form-control" style="border-radius: 7px; color: rgb(0, 0, 0); width: 135px;">
+          </div>
+          
+          <div class="form-group mb-3">
+            <label class="control-label" for="company"></label>
+            <input type="number" step="0.01" min="0" id="amount_min" name="min_price" placeholder="Min Price"
+              class="form-control" style="border-radius: 7px; color: rgb(0, 0, 0); width: 135px;">
+          </div>
+          
+          <div class="form-group mb-3">
+            <label class="control-label" for="company"></label>
+            <input type="number" step="0.01" min="0" id="amount_max" name="max_price" placeholder="Max Price"
+              class="form-control" style="border-radius: 7px; color: rgb(0, 0, 0); width: 135px;">
+          </div>
+          
+          <div class="form-group">
+            <label class="control-label" for="company"></label>
+            <input type="submit" style="border-radius: 7px; height: 34px;" class="searchbutton" value="Search" />
           </div>
         </form>
       </div>
     </div>
     <hr>
   </div>
+
+  
+
+  
+
+
   <br>
   <script>
     var a = []
@@ -139,6 +207,10 @@ See the LICENSE file in the project root for the full license information.
     }
   </script>
   {% endfor %}
+
+
+ 
+</div>
   <div class="grid">
   </div>
 
@@ -149,6 +221,37 @@ See the LICENSE file in the project root for the full license information.
     {% endfor %}
   </div>
 
+ 
+  
+
+  <script>
+   async function sendMessage() {
+    const userInput = document.getElementById("user-input").value;
+    const response = await fetch("/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: userInput })
+    });
+
+    const result = await response.json();
+    console.log("Server response:", result);  // Debugging print
+    
+    if (result.error) {
+        document.getElementById("chat-box").innerText = result.error;
+    } else {
+        const assistantMessage = document.createElement("div");
+        assistantMessage.textContent = "Assistant: " + result.response;
+        document.getElementById("chat-box").appendChild(assistantMessage);
+    }
+}
+
+
+
+    </script>
+    
+    
   <script>
     function getTemplate() {
       return tempelate = `
@@ -168,6 +271,8 @@ See the LICENSE file in the project root for the full license information.
          </div>
      </div>`;
     }
+
+    
 
     // Pagination logic
     var itemsPerPage = 20;
@@ -222,7 +327,9 @@ See the LICENSE file in the project root for the full license information.
         // Create a new div for the cheapest product and append the card to it
         let cheapestProductDiv = document.createElement("div");
         cheapestProductDiv.setAttribute("class", "cheapest-product-container");
-        cheapestProductDiv.style.backgroundColor = "green";
+        cheapestProductDiv.style.backgroundColor = "#90EE90"; // Light green
+cheapestProductDiv.style.boxShadow = "1 0 10px rgba(144, 238, 144, 0.6)"; // Light green glow
+
         cheapestProductDiv.appendChild(wrapper);
 
         // Insert the new div with the cheapest product at the top of the grid
@@ -379,3 +486,5 @@ See the LICENSE file in the project root for the full license information.
 </body>
 
 </html>
+
+
