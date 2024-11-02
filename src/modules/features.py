@@ -218,10 +218,7 @@ def share_wishlist(username, wishlist_name, email_receiver):
             return 'failed to send email'
     else:
         return None # wishlist not found
-        except Exception:
-            return 'failed to send email'
-    else:
-        return None # wishlist not found
+       
 
 def wishlist_remove_list(username, wishlist_name, indx):
     wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
