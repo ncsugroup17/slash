@@ -13,7 +13,7 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 [![Python Application](https://github.com/SE23-Team44/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/python-package.yml)
 [![Running Code Coverage](https://github.com/SE23-Team44/slash/actions/workflows/code_cov.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/code_cov.yml)
 [![OAuth and scrappers](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/python-package.yml)
-[![Style Check](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/main.yml/badge.svg)](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/main.yml)
+[![Python Style Checker](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/style_checker.yml/badge.svg)](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/style_checker.yml)
 
 [![GitHub issues](https://img.shields.io/github/issues/SE23-Team44/slash)](https://github.com/SE23-Team44/slash/issues)
 [![Github closes issues](https://img.shields.io/github/issues-closed-raw/SE23-Team44/slash)](https://github.com/SE23-Team44/slash/issues?q=is%3Aissue+is%3Aclosed)
