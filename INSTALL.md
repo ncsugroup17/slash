@@ -54,7 +54,7 @@ In the project root directory, create a `.env` file for environment-specific var
 Example `.env` file contents:
 
 ```plaintext
-FLASK_APP=src/modules/app.py
+set FLASK_APP=.\src\modules\app 
 FLASK_ENV=development
 GOOGLE_CLIENT_SECRET_PATH=C:\Users\Desmond\Desktop\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json
 ```
