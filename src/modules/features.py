@@ -73,103 +73,103 @@
 #     list_of_users = list(filter(lambda u: os.path.isdir(os.path.join(users_main_dir, u)), ls))
 #     return list_of_users
 
-# def create_wishlist(username, wishlist_name):
-#     wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
-#     open(wishlist_path, "a").close()
+def create_wishlist(username, wishlist_name):
+    wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
+    open(wishlist_path, "a").close()
 
-# def create_credentials(username, password):
-#     cred_path = usr_dir(username) / ("cred.csv")
-#     open(cred_path, "a").close()
-#     item_data = {
-#         "username": username,
-#         "password": password,
-#     }
-#     item_data = pd.DataFrame([item_data])
-#     item_data.to_csv(cred_path, index=False, header=item_data.columns)
+def create_credentials(username, password):
+    cred_path = usr_dir(username) / ("cred.csv")
+    open(cred_path, "a").close()
+    item_data = {
+        "username": username,
+        "password": password,
+    }
+    item_data = pd.DataFrame([item_data])
+    item_data.to_csv(cred_path, index=False, header=item_data.columns)
 
-# def get_credentials(username):
-#     cred_path = usr_dir(username) / ("cred.csv")
-#     if os.path.exists(cred_path):
-#         try:
-#             csv = pd.read_csv(cred_path)
-#             row = csv.iloc[0]
-#             return str(row['password'])
-#         except Exception:
-#             return ''
-#     else:
-#         return '' 
+def get_credentials(username):
+    cred_path = usr_dir(username) / ("cred.csv")
+    if os.path.exists(cred_path):
+        try:
+            csv = pd.read_csv(cred_path)
+            row = csv.iloc[0]
+            return str(row['password'])
+        except Exception:
+            return ''
+    else:
+        return '' 
 
-# def list_wishlists(username):
-#     user_dir = usr_dir(username)
-#     wishlists = list(map(lambda w: w.replace(".csv", ""), os.listdir(user_dir)))
-#     return wishlists
+def list_wishlists(username):
+    user_dir = usr_dir(username)
+    wishlists = list(map(lambda w: w.replace(".csv", ""), os.listdir(user_dir)))
+    return wishlists
 
-# def delete_wishlist(username, wishlist_name):
-#     wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
-#     wishlist_path.unlink(missing_ok=True)
+def delete_wishlist(username, wishlist_name):
+    wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
+    wishlist_path.unlink(missing_ok=True)
 
-# def wishlist_add_item(username, wishlist_name, item_data):
-#     if isinstance(item_data, dict):
-#         item_data = pd.DataFrame([item_data])
-#     wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
-#     if os.path.exists(wishlist_path) and (os.path.getsize(wishlist_path) > 0 ):
-#         old_data = pd.read_csv(wishlist_path)
-#     else:
-#         old_data = pd.DataFrame()
-#     #if self.df.title[indx] not in old_data:
-#     final_data = pd.concat([old_data, item_data])
-#     final_data.to_csv(wishlist_path, index=False, header=item_data.columns)
+def wishlist_add_item(username, wishlist_name, item_data):
+    if isinstance(item_data, dict):
+        item_data = pd.DataFrame([item_data])
+    wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
+    if os.path.exists(wishlist_path) and (os.path.getsize(wishlist_path) > 0 ):
+        old_data = pd.read_csv(wishlist_path)
+    else:
+        old_data = pd.DataFrame()
+    #if self.df.title[indx] not in old_data:
+    final_data = pd.concat([old_data, item_data])
+    final_data.to_csv(wishlist_path, index=False, header=item_data.columns)
 
-# def read_wishlist(username, wishlist_name):
-#     wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
-#     if os.path.exists(wishlist_path):
-#         try:
-#             csv = pd.read_csv(wishlist_path)
-#             for index,obj in csv.iterrows():
-#                 new_price = update_price(obj['link'],obj['website'],obj['price'])
-#                 csv.at[index, 'price'] = new_price
-#             return csv
-#         except Exception:
-#             return pd.DataFrame()
-#     else:
-#         return None # wishlist not found
+def read_wishlist(username, wishlist_name):
+    wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
+    if os.path.exists(wishlist_path):
+        try:
+            csv = pd.read_csv(wishlist_path)
+            for index,obj in csv.iterrows():
+                new_price = update_price(obj['link'],obj['website'],obj['price'])
+                csv.at[index, 'price'] = new_price
+            return csv
+        except Exception:
+            return pd.DataFrame()
+    else:
+        return None # wishlist not found
 
-# def share_wishlist(username, wishlist_name, email_receiver):
-#     wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
-#     if os.path.exists(wishlist_path):
-#         try:
-#             email_sender = 'slash.se23@gmail.com'
-#             email_password = Config.EMAIL_PASS
+def share_wishlist(username, wishlist_name, email_receiver):
+    wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
+    if os.path.exists(wishlist_path):
+        try:
+            email_sender = 'slash.se23@gmail.com'
+            email_password = Config.EMAIL_PASS
 
-#             subject = ' slash wishlist of ' + username
+            subject = ' slash wishlist of ' + username
 
-#             df = pd.read_csv(wishlist_path)
-#             links_list = df['link'].astype(str).str.cat(sep=' ')
-#             body = "\n".join([f"{i}. {link}" for i, link in enumerate(links_list.split(), start=1)])
+            df = pd.read_csv(wishlist_path)
+            links_list = df['link'].astype(str).str.cat(sep=' ')
+            body = "\n".join([f"{i}. {link}" for i, link in enumerate(links_list.split(), start=1)])
 
-#             em = EmailMessage()
-#             em['from'] = email_sender
-#             em['to'] = email_receiver
-#             em['subject'] = subject
-#             em.set_content(body)
+            em = EmailMessage()
+            em['from'] = email_sender
+            em['to'] = email_receiver
+            em['subject'] = subject
+            em.set_content(body)
             
 
-#             context = ssl.create_default_context()
+            context = ssl.create_default_context()
 
-#             with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-#                 smtp.login(email_sender, email_password)
-#                 smtp.sendmail(email_sender, email_receiver, em.as_string())
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+                smtp.login(email_sender, email_password)
+                smtp.sendmail(email_sender, email_receiver, em.as_string())
 
-#         except Exception:
-#             return 'failed to send email'
-#     else:
-#         return None # wishlist not found
+        except Exception:
+            return 'failed to send email'
+    else:
+        return None # wishlist not found
 
-# def wishlist_remove_list(username, wishlist_name, indx):
-#     wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
-#     old_data = read_wishlist(username, wishlist_name)
-#     old_data = old_data.drop(index=indx)
-#     old_data.to_csv(wishlist_path, index=False, header=old_data.columns)
+def wishlist_remove_list(username, wishlist_name, indx):
+    wishlist_path = usr_dir(username) / (wishlist_name + ".csv")
+    old_data = read_wishlist(username, wishlist_name)
+    old_data = old_data.drop(index=indx)
+    old_data.to_csv(wishlist_path, index=False, header=old_data.columns)
 
 # def find_currency(price):
 #     currency = re.match(r'^[a-zA-Z]{3,5}', price)

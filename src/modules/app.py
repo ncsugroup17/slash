@@ -70,6 +70,8 @@ def login():
         return render_template("./static/landing.html", login=False, invalid=True)
     return render_template('./static/login.html')
 
+
+
 @app.route('/login/google')
 def login_google():
     authorization_url, state = flow.authorization_url()
@@ -90,7 +92,7 @@ def callback():
     if not check_user(session['username'], None):
         create_user(session['username'], None, name=id_info['name'])
     
-    return redirect(url_for("search"))
+    return redirect(url_for("login"))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -105,6 +107,10 @@ def wishlist():
     username = session.get('username')
     items = read_wishlist(username, "default").to_dict('records')
     return render_template('./static/wishlist.html', data=items)
+
+
+
+    
 
 @app.route('/share', methods=['POST'])
 def share():
