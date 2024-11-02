@@ -75,26 +75,21 @@ Note: To get the share by email functionality. Please email slash.se23@gmail.com
 
 New grid UI with product images for a smoother shopping experience.  
 
-<p align="center"><img width="700" src="./assets/Result.png"></p>  
+<p align="center"><img width="700" src="./assets/Resultfinal.png"></p>  
 
-Choose between Dark and Light themes to suit your needs!  
 
-<p align="center"><img width="700" src="./assets/Team44_dark_light_theme.gif"></p>  
 
-View products page by page.  
+Now we can add Comments and read Comments.  
 
-<p align="center"><img width="700" src="./assets/Team44_pagination.gif"></p>  
+<p align="center"><img width="700" src="./assets/comments.gif"></p>  
 
-### Share your wishlist through email!  
 
-<p align="center"><img width="700" src="./assets/Team44_wishlist_share.gif"></p>
 
-### User login with password    
-Login securely with a password  
-<p align="center"><img width="700" src="./assets/Team44_register.gif"></p>
+### User login with Google   
+ 
+<p align="center"><img width="700" src="./assets/Ui.gif"></p>
 
-### View the cheapest product with ease  
-<p align="center"><img width="700" src="./assets/Team44_cheapest_product.png"></p>  
+ 
 
 ### Other Enhancements:
 * __More websites added for scrapping -Ebay, Target, Bestbuy__
@@ -105,7 +100,7 @@ Login securely with a password
 :movie_camera: Checkout our demo video
 ---
 
-[![Video](https://img.youtube.com/vi/5iCc2LJa_bI/0.jpg)](https://youtu.be/5iCc2LJa_bI)
+[Click for Demo Video](https://drive.google.com/file/d/1Efehn_X6z4WYxklG2uGirg7ytlanE8Hl/view)
 
 
 # :muscle: What's next for future development?
