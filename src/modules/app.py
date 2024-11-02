@@ -10,8 +10,7 @@ from flask import Flask, session, render_template, request, redirect, url_for
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport import requests
-from .scraper import driver, filter
-from .formatter import formatResult
+from .scraper import driver
 from .features import create_user, check_user, wishlist_add_item, read_wishlist, wishlist_remove_list, share_wishlist
 from .config import Config
 
