@@ -1,10 +1,9 @@
-# .github/workflows/coverage.yml
-name: Run Tests and Report Coverage
+name: Code Coverage
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  coverage:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,14 +18,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov codecov
+          pip install -r requirements.txt
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=your_package_name --cov-report=xml
+          pytest --cov=src --cov-report=xml
 
       - name: Upload coverage to Codecov
-        env:
-          CODECOV_TOKEN: 1f3091d7-70a4-431f-8ae7-26541c706b5e
-        run: |
-          codecov -f coverage.xml
+        uses: codecov/codecov-action@v2
+        with:
+          token: 1f3091d7-70a4-431f-8ae7-26541c706b5e
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-coverage-report
