@@ -1,81 +1,32 @@
-#Copyright (C) 2023 SE23-Team44
+# .github/workflows/coverage.yml
+name: Run Tests and Report Coverage
 
-# Licensed under the MIT License.
-# See the LICENSE file in the project root for the full license information.
-
-# This workflow will install Python dependencies, run tests and create a Code Coverage Report
-
-name: Running Code Coverage
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install Python 3.10.13
-        uses: actions/setup-python@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          python-version: 3.11.10
+          python-version: '3.8'
+
       - name: Install dependencies
         run: |
-          pip install coverage
-          pip install pytest-cov
-          pip install -r requirements.txt
-          echo requirements installed
-      - name: Run the tests
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov codecov
+
+      - name: Run tests with coverage
         run: |
-          cd tests
-          pytest --cov=./ --cov-report=xml
+          pytest --cov=your_package_name --cov-report=xml
+
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN}}
-# This workflow will install Python dependencies, run tests and create a Code Coverage Report
-
-# name: Code Coverage
-
-# on:
-#   push:
-#     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
-
-# jobs:
-#   build:
-
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - uses: actions/checkout@main
-#       - uses: codecov/codecov-action@v2
-#         with:
-#           token: ${{ secrets.CODECOV_TOKEN }}
-
-#       - name: Generate coverage report
-#         run: |
-#           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-#           pip install pytest
-#           pip install pytest-cov
-#           echo $PWD
-#           export PYTHONPATH=$PWD
-#           pytest --cov=./ --cov-report=xml
-#       - name: Upload coverage to Codecov
-#         uses: codecov/codecov-action@v3
-#         with:
-#           token: ${{ secrets.CODECOV_TOKEN }}
-#           directory: ./coverage/reports/
-#           env_vars: OS,PYTHON
-#           fail_ci_if_error: true
-#           files: ./coverage.xml,
-#           flags: unittests
-#           name: codecov-umbrella
-#           path_to_write_report: ./coverage/codecov_report.txt
-#           verbose: true
+        env:
+          CODECOV_TOKEN: 1f3091d7-70a4-431f-8ae7-26541c706b5e
+        run: |
+          codecov -f coverage.xml
