@@ -4,7 +4,7 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 <p align="center"><img width="500" src="./assets/Shop.gif"></p>
 
 [![GitHub license](https://img.shields.io/github/license/SE23-Team44/slash)](https://github.com/SE23-Team44/slash/blob/main/LICENSE)
-[![DOI](https://zenodo.org/badge/714922498.svg)](https://zenodo.org/doi/10.5281/zenodo.10212057)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14029366.svg)](https://doi.org/10.5281/zenodo.14029366)
 ![Github](https://img.shields.io/badge/language-python-red.svg)
 [![Run Tests On Push](https://github.com/SE23-Team44/slash/actions/workflows/unit_test.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/unit_test.yml)
 [![codecov](https://codecov.io/gh/SE23-Team44/slash/branch/main/graph/badge.svg?token=9YO9QKQZPJ)](https://codecov.io/gh/SE23-Team44/slash)
