@@ -8,7 +8,7 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 ![Github](https://img.shields.io/badge/language-python-red.svg)
 [![Run Tests On Push](https://github.com/SE23-Team44/slash/actions/workflows/unit_test.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/unit_test.yml)
 [![codecov](https://codecov.io/gh/SE23-Team44/slash/branch/main/graph/badge.svg?token=9YO9QKQZPJ)](https://codecov.io/gh/SE23-Team44/slash)
-[![Lint Python](https://github.com/SE23-Team44/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/pylint.yml)
+[![Pylint](https://github.com/SE23-Team44/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/pylint.yml)
 [![Close as a feature](https://github.com/SE23-Team44/slash/actions/workflows/close_as_a_feature.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/close_as_a_feature.yml)
 [![Python Application](https://github.com/SE23-Team44/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/python-package.yml)
 [![Running Code Coverage](https://github.com/SE23-Team44/slash/actions/workflows/code_cov.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/code_cov.yml)
