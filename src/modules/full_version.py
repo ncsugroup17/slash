@@ -1,24 +1,29 @@
 """
 Copyright (C) 2021 SE Slash - All Rights Reserved
-You may use, distribute and modify this code under the
-terms of the MIT license.
-You should have received a copy of the MIT license with
-this file. If not, please write to: secheaper@gmail.com
+You may use, distribute and modify this code under the terms of the MIT license.
+You should have received a copy of the MIT license with this file. If not, please write to: secheaper@gmail.com
 """
 
-from genericpath import exists
 import json
 import os
 import pandas as pd
-from src.modules.scraper import driver
 import webbrowser
-import numpy as np
-from pathlib import Path
+from src.modules.scraper import driver
+from src.modules.features import (
+    users_main_dir,
+    create_user,
+    list_users,
+    create_wishlist,
+    delete_wishlist,
+    list_wishlists,
+    read_wishlist,
+    wishlist_add_item,
+    wishlist_remove_list
+)
 from shutil import get_terminal_size
 
-from src.modules.features import users_main_dir, create_user, list_users, create_wishlist, delete_wishlist, list_wishlists, read_wishlist, wishlist_add_item, wishlist_remove_list
 
-class full_version:
+class FullVersion:
     def __init__(self):
         self.name = "default"
         self.password = "pass"
@@ -31,8 +36,7 @@ class full_version:
         pd.set_option("display.max_colwidth", 40)
 
     def login(self):
-        """Used for User Login
-        Returns the username and email"""
+        """Used for User Login. Returns the username and email."""
         if not os.path.exists(self.default_user_file):
             print("Welcome to Slash!")
             print("Please enter the following information: ")
@@ -42,15 +46,14 @@ class full_version:
                 json.dump(user_data, outfile)
             self.name = name
             create_user(self.name, self.password)
-
         else:
             with open(self.default_user_file) as json_file:
                 data = json.load(json_file)
                 self.name = data["name"]
         return self.name
+
     def search_fn(self):
-        """Function searches for a given product and returns full list of products scraped.
-        It then gives the user and option to save an item or open an item in browser"""
+        """Searches for a product, returns the scraped list, and allows user to save or open an item."""
         prod = input("Enter name of product to Search: ")
         self.scrape(prod)
         ch = input(
@@ -58,41 +61,25 @@ class full_version:
         )
         try:
             ch = int(ch)
-        except Exception:
-            pass
-        """By selecting 1, the User can store a searched product into a wishlist. Multiple wishlist are available and it has to be pre-selected 
-        to store an item into it."""
+        except ValueError:
+            return
+
         if ch == 1:
             wish_lists = self.wishlist_maker()
             wishlist_index = int(input("\nEnter your wishlist index: "))
             selected_wishlist = wish_lists[wishlist_index]
-            """Select the row number of the product to save into the selected wishlist."""
             indx = int(input("\nEnter row number of product to save: "))
             if indx < len(self.df):
                 new_data = self.df.iloc[[indx]]
                 wishlist_add_item(self.name, selected_wishlist, new_data)
                 print("Item added successfully")
-                """
-                if os.path.exists(wishlist_path) and (
-                    os.path.getsize(wishlist_path) > 0
-                ):
-                    old_data = pd.read_csv(wishlist_path)
-                else:
-                    old_data = pd.DataFrame()
-                if self.df.title[indx] not in old_data:
-                    final_data = pd.concat([old_data, new_data])
-                    print("Item added successfully")
-                final_data.to_csv(wishlist_path, index=False, header=self.df.columns)
-                """
-        """Selecting 2 allows the user to open the searched item in a broswer"""
-        if ch == 2:
+
+        elif ch == 2:
             indx = int(input("\nEnter row number of product to open: "))
             webbrowser.open_new(self.df.link[indx])
 
-        return
-
     def extract_list(self):
-        """This function helps user extract saved products, create new lists, modify list or open product in browser"""
+        """Helps user manage saved products, create new lists, or open products in browser."""
         wish_lists = self.wishlist_maker()
         wishlist_options = int(
             input(
@@ -105,20 +92,10 @@ class full_version:
             selected_wishlist = wish_lists[wishlist_index]
             items_data = read_wishlist(self.name, selected_wishlist)
             if items_data is not None:
-                if(len(items_data)):
+                if len(items_data):
                     print(items_data)
                 else:
                     print("Empty Wishlist")
-                """
-            wishlist_path = self.user_list_dir / selected_wishlist
-            if os.path.exists(wishlist_path):
-                try:
-                    old_data = pd.read_csv(wishlist_path)
-                    print(old_data)
-                except Exception:
-                    old_data = pd.DataFrame()
-                    print("Empty Wishlist")
-                """
                 choice = int(
                     input(
                         "\nSelect from the following:\n1. Delete item from list\n2. Open link in Chrome\n3. Return to Main\n"
@@ -127,12 +104,12 @@ class full_version:
                 if choice == 1:
                     indx = int(input("\nEnter row number to be removed: "))
                     wishlist_remove_list(self.name, selected_wishlist, indx)
-                if choice == 2:
+                elif choice == 2:
                     indx = int(input("\nEnter row number to open in chrome: "))
                     url = items_data.link[indx]
                     webbrowser.open_new(url)
             else:
-                print("Wishlist doesnot exist")
+                print("Wishlist does not exist")
 
         elif wishlist_options == 2:
             wishlist_name = str(input("\nName your wishlist: "))
@@ -142,10 +119,9 @@ class full_version:
             wishlist_index = int(input("Enter the wishlist index to delete: "))
             selected_wishlist = wish_lists[wishlist_index]
             delete_wishlist(self.name, selected_wishlist)
-        else:
-            print("No saved data found.")
 
     def wishlist_maker(self):
+        """Displays existing wishlists and returns them as a list."""
         wish_lists = []
         print("----------Wishlists---------")
         for index, wishlist in enumerate(list_wishlists(self.name)):
@@ -154,6 +130,7 @@ class full_version:
         return wish_lists
 
     def view_users(self):
+        """Displays all users."""
         users_list = []
         print("----------Users---------")
         for user in list_users():
@@ -162,6 +139,7 @@ class full_version:
         return users_list
 
     def change_user(self):
+        """Allows changing the current user."""
         self.view_users()
         username = input("Enter username (username will be created if not exist):")
         create_user(username, self.password)
@@ -172,18 +150,16 @@ class full_version:
         print("Welcome ", self.name)
 
     def scrape(self, prod):
-        """calls the scraper function from scraper.py"""
+        """Calls the scraper function from scraper.py."""
         results = driver(prod, df_flag=1, currency=self.currency)
-        # results = formatter.sortList(results, "ra" , True)
         self.df = pd.DataFrame.from_dict(results, orient="columns")
         print(self.df)
-        #print(self.df.replace("", np.nan).dropna())
 
     def driver(self):
+        """Main driver function to control user interactions."""
         self.login()
-        flag_loop = 1
         print("Welcome ", self.name)
-        while flag_loop == 1:
+        while True:
             print("Select from following:")
             print(
                 "1. Search new product\n2. Manage Wishlists\n3. See Currency Conversion\n4. Change user\n0. Exit"
@@ -199,6 +175,6 @@ class full_version:
                 self.change_user()
             elif choice == 0:
                 print("Thank You for Using Slash")
-                flag_loop = 0
+                break
             else:
                 print("Incorrect Option")

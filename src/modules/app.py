@@ -20,29 +20,29 @@ app.secret_key = Config.SECRET_KEY
 
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-CLIENT_SECRETS_FILE = r"C:\Users\yaswanth\Desktop\ayush\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
+CLIENT_SECRETS_FILE = r"C:\Users\Desmond\Desktop\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
 flow = Flow.from_client_secrets_file(
     CLIENT_SECRETS_FILE,
-    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
+    scopes=[
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid"
+    ],
     redirect_uri=Config.GOOGLE_REDIRECT_URI
 )
 
-# Helper function to load comments
-import csv
-
 def load_comments():
+    """Load comments from comments.csv."""
     comments = {}
     try:
         with open('comments.csv', mode='r') as file:
             reader = csv.DictReader(file)
-            if 'product_name' not in reader.fieldnames or 'username' not in reader.fieldnames or 'comment' not in reader.fieldnames:
+            if {'product_name', 'username', 'comment'} - set(reader.fieldnames):
                 raise ValueError("comments.csv is missing required headers.")
                 
             for row in reader:
                 product_name = row['product_name']
-                if product_name not in comments:
-                    comments[product_name] = []
-                comments[product_name].append({
+                comments.setdefault(product_name, []).append({
                     'username': row['username'],
                     'comment': row['comment']
                 })
@@ -51,7 +51,6 @@ def load_comments():
     except ValueError as e:
         print(f"Error in loading comments: {e}")
     return comments
-
 
 # Routes
 
@@ -69,8 +68,6 @@ def login():
         return render_template("./static/landing.html", login=False, invalid=True)
     return render_template('./static/login.html')
 
-
-
 @app.route('/login/google')
 def login_google():
     authorization_url, state = flow.authorization_url()
@@ -82,12 +79,13 @@ def callback():
     flow.fetch_token(authorization_response=request.url)
     credentials = flow.credentials
     request_session = requests.Request()
-    id_info = id_token.verify_oauth2_token(credentials.id_token, request_session, flow.client_config['client_id'])
+    id_info = id_token.verify_oauth2_token(
+        credentials.id_token, request_session, flow.client_config['client_id']
+    )
     
     session['username'] = id_info['email']
     session['user_info'] = {'name': id_info['name'], 'email': id_info['email']}
     
-    # Create user if not already exists
     if not check_user(session['username'], None):
         create_user(session['username'], None, name=id_info['name'])
     
@@ -104,22 +102,10 @@ def register():
 @app.route('/wishlist')
 def wishlist():
     username = session.get('username')
-    wishlist_name = session.get('wishlist_name', 'default')  # Or any other default
-    
-    # Fetch items from the wishlist
+    wishlist_name = session.get('wishlist_name', 'default')
     items = read_wishlist(username, wishlist_name)
-    
-    # Convert to dictionary records if the wishlist is not empty
-    if not items.empty:
-        items = items.to_dict('records')
-    else:
-        items = []  # Provide an empty list if the wishlist has no items
-    
+    items = items.to_dict('records') if not items.empty else []
     return render_template('wishlist.html', items=items)
-
-
-
-    
 
 @app.route('/share', methods=['POST'])
 def share():
@@ -144,17 +130,15 @@ def search():
     if data is None or data.empty:
         return render_template("./static/result.html", error="No results found for your search.", total_pages=0)
 
-    # Load comments
     comments = load_comments()
-    total_pages = (len(data) + 19) // 20  # 20 items per page, rounded up
+    total_pages = (len(data) + 19) // 20
     return render_template("./static/result.html", data=data.to_dict(orient='records'), prod=product, total_pages=total_pages, comments=comments)
-
 
 @app.route('/add_comment', methods=['POST'])
 def add_comment():
-    product_name = request.form.get('product_name')  # Retrieve product name
+    product_name = request.form.get('product_name')
     comment = request.form.get('comment')
-    username = session.get('username')  # Assuming username is stored in the session
+    username = session.get('username')
 
     if product_name and comment and username:
         with open('comments.csv', mode='a', newline='') as file:
@@ -163,15 +147,19 @@ def add_comment():
 
     return redirect(url_for('search'))
 
-
 @app.route("/filter", methods=["POST", "GET"])
 def product_search_filtered():
     product = request.args.get("product_name")
-    sort = request.form.get("sort", None)
-    currency = request.form.get("currency", None)
-    min_price, max_price, min_rating = map(lambda x: float(x) if x else None, [request.form.get("min_price"), request.form.get("max_price"), request.form.get("min_rating")])
+    sort = request.form.get("sort")
+    currency = request.form.get("currency")
+    min_price, max_price, min_rating = map(lambda x: float(x) if x else None, [
+        request.form.get("min_price"), request.form.get("max_price"), request.form.get("min_rating")
+    ])
 
-    return product_search_filtered(product, sort if sort != "default" else None, currency if currency != "usd" else None, None, min_price, max_price, min_rating)
+    return product_search_filtered(
+        product, sort if sort != "default" else None, currency if currency != "usd" else None,
+        None, min_price, max_price, min_rating
+    )
 
 @app.route("/add-wishlist-item", methods=["POST"])
 def add_wishlist_item():

@@ -1,28 +1,26 @@
 """
 Copyright (C) 2021 SE Slash - All Rights Reserved
-You may use, distribute and modify this code under the
-terms of the MIT license.
-You should have received a copy of the MIT license with
-this file. If not, please write to: secheaper@gmail.com
+You may use, distribute and modify this code under the terms of the MIT license.
+You should have received a copy of the MIT license with this file. If not, please write to: secheaper@gmail.com
 """
 
 """
-The scraper module holds functions that actually scrape the e-commerce websites
+The scraper module contains functions that scrape various e-commerce websites.
 """
 
 import requests
-from .formatter import formatSearchQuery,formatResult,getCurrency,sortList
-from bs4 import BeautifulSoup
-import re
-import csv
-import pandas as pd
 import os
+import re
+import pandas as pd
+from bs4 import BeautifulSoup
 from datetime import datetime
 from ebaysdk.finding import Connection
+from .formatter import formatSearchQuery, formatResult, getCurrency, sortList
+
 
 def httpsGet(URL):
     """
-    The httpsGet function makes HTTP called to the requested URL with custom headers
+    Makes an HTTP GET request to the specified URL with custom headers.
     """
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',  # noqa: E501
@@ -35,36 +33,34 @@ def httpsGet(URL):
     }
     s = requests.Session()
     page = s.get(URL, headers=headers, allow_redirects=False)
-    soup1 = BeautifulSoup(page.content, "html.parser")
-    return BeautifulSoup(soup1.prettify(), "html.parser")
+    soup = BeautifulSoup(page.content, "html.parser")
+    return BeautifulSoup(soup.prettify(), "html.parser")
+
+
 
 
 def searchAmazon(query, df_flag, currency):
     """
-    The searchAmazon function scrapes amazon.com
-    Parameters: query- search query for the product, df_flag- flag variable, currency- currency type entered by the user
-    Returns a list of items available on Amazon.com that match the product entered by the user.
+    Scrapes amazon.com for products matching the search query.
     """
     query = formatSearchQuery(query)
     URL = f"https://www.amazon.com/s?k={query}"
     page = httpsGet(URL)
     results = page.findAll("div", {"data-component-type": "s-search-result"})
     products = []
+
     for res in results:
         titles, prices, links = (
             res.select("h2 a span"),
             res.select("span.a-price span"),
-            res.select("h2 a.a-link-normal"),
+            res.select("h2 a.a-link-normal")
         )
         ratings = res.select("span.a-icon-alt")
         num_ratings = res.select("span.a-size-base")
         trending = res.select("span.a-badge-text")
         img_links = res.select("img.s-image")
 
-        if len(trending) > 0:
-            trending = trending[0]
-        else:
-            trending = None
+        trending = trending[0] if trending else None
         product = formatResult(
             "amazon",
             titles,
@@ -84,9 +80,7 @@ def searchAmazon(query, df_flag, currency):
 
 def searchWalmart(query, df_flag, currency):
     """
-    The searchWalmart function scrapes walmart.com
-    Parameters: query- search query for the product, df_flag- flag variable, currency- currency type entered by the user
-    Returns a list of items available on walmart.com that match the product entered by the user
+    Scrapes walmart.com for products matching the search query.
     """
     query = formatSearchQuery(query)
     URL = f"https://www.walmart.com/search?q={query}"
@@ -94,20 +88,19 @@ def searchWalmart(query, df_flag, currency):
     results = page.findAll("div", {"data-item-id": True})
     products = []
     pattern = re.compile(r"out of 5 Stars")
+
     for res in results:
         titles, prices, links = (
             res.select("span.lh-title"),
             res.select("div.lh-copy"),
-            res.select("a"),
+            res.select("a")
         )
         ratings = res.findAll("span", {"class": "w_iUH7"}, text=pattern)
         num_ratings = res.findAll("span", {"class": "sans-serif gray f7"})
         trending = res.select("span.w_Cs")
         img_links = res.select("div.relative.overflow-hidden img")
-        if len(trending) > 0:
-            trending = trending[0]
-        else:
-            trending = None
+
+        trending = trending[0] if trending else None
         product = formatResult(
             "walmart",
             titles,
@@ -123,22 +116,6 @@ def searchWalmart(query, df_flag, currency):
         products.append(product)
     return products
 
-def amazon_scraper(link):
-    try:
-        page = httpsGet(link)
-
-        whole_price = page.select('span.a-price-whole')[0].text.strip()
-        numeric_value = re.search(r'\b\d+\b',whole_price)
-        if numeric_value:
-            numeric_value = numeric_value.group()
-            res = page.select('span.a-price-symbol')[0].text.strip() + numeric_value + '.' + page.select('span.a-price-fraction')[0].text.strip()
-            return res
-        else:
-            return None
-    
-    except Exception as e:
-        print(f'There was an error in scraping {link}, Error is {e}')
-        return None
     
 def google_scraper(link):
     try:
@@ -164,6 +141,7 @@ def walmart_scraper(link):
     except Exception as e:
         print(f'There was an error in scraping {link}, Error is {e}')
         return None
+    
 
 def ebay_scraper(link):
     try:
@@ -180,6 +158,7 @@ def ebay_scraper(link):
         print(f'There was an error in scraping {link}, Error is {e}')
         return None
 
+
 def bestbuy_scraper(link):
     try:
         page = httpsGet(link)
@@ -190,6 +169,7 @@ def bestbuy_scraper(link):
         print(f'There was an error in scraping {link}, Error is {e}')
         return None
 
+
 def target_scraper(link):
     try:
         page = httpsGet(link)
@@ -199,43 +179,34 @@ def target_scraper(link):
     except Exception as e:
         print(f'There was an error in scraping {link}, Error is {e}')
         return None
+
     
 def searchEtsy(query, df_flag, currency):
     """
-    The searchEtsy function scrapes Etsy.com
-    Parameters: query- search query for the product, df_flag- flag variable, currency- currency type entered by the user
-    Returns a list of items available on Etsy.com that match the product entered by the user
+    Scrapes Etsy.com for products matching the search query.
     """
     query = formatSearchQuery(query)
     url = f"https://www.etsy.com/search?q={query}"
-    products = []
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
     }
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, "lxml")
-    for item in soup.findAll(".wt-grid__item-xs-6"):
-        str = item.select("a")
-        if str == []:
-            continue
-        else:
-            links = str
+    products = []
 
-        ratings=None
-        num_ratings=None
-       
-        titles, prices = (item.select("h3")), (item.select(".currency-value"))
-        ratings_text = item.find("div",class_='wt-align-items-center wt-max-height-full wt-display-flex-xs flex-direction-row-xs wt-text-title-small wt-no-wrap')
-        
+    for item in soup.findAll(".wt-grid__item-xs-6"):
+        links = item.select("a")
+        if not links:
+            continue
+
+        titles = item.select("h3")
+        prices = item.select(".currency-value")
+        ratings_text = item.find("div", class_='wt-align-items-center wt-no-wrap')
+        ratings, num_ratings = None, None
         if ratings_text:
-            ratings = ratings_text.get_text().split()[0]
-            num_ratings = ratings_text.get_text().split()[1]
-        
-        trending = item.select("span.wt-badge")
-        if len(trending) > 0:
-            trending = trending[0]
-        else:
-            trending = None
+            ratings, num_ratings = ratings_text.get_text().split()[:2]
+
+        trending = item.select("span.wt-badge")[0] if item.select("span.wt-badge") else None
         product = formatResult(
             "Etsy",
             titles,
@@ -245,10 +216,10 @@ def searchEtsy(query, df_flag, currency):
             num_ratings,
             trending,
             df_flag,
-            currency,
+            currency
         )
         products.append(product)
-    
+
     return products
 
 
@@ -333,6 +304,7 @@ def searchBJs(query, df_flag, currency):
         products.append(product)
     return products
 
+
 def searchEbay(query, df_flag, currency):
     """
     The searchEbay function scrapes https://www.ebay.com/
@@ -377,7 +349,6 @@ def searchEbay(query, df_flag, currency):
 
     return products
 
-import requests
 
 def searchTarget(query, df_flag, currency):
     """
@@ -516,6 +487,7 @@ def condense_helper(result_condensed, list, num):
             if p["title"] != None and p["title"] != "":
                 result_condensed.append(p)
 
+
 def filter(data, price_min = None, price_max = None, rating_min = None):
     filtered_result = []
     for row in data:
@@ -537,6 +509,7 @@ def filter(data, price_min = None, price_max = None, rating_min = None):
         else:
             filtered_result.append(row)
     return filtered_result
+
 
 def driver(
     product, currency, num=None, df_flag=0, csv=False, cd=None, ui=False, sort=None
