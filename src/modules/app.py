@@ -21,7 +21,7 @@ app.secret_key = Config.SECRET_KEY
 
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-CLIENT_SECRETS_FILE = r"C:\Users\yaswanth\Desktop\ayush\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
+CLIENT_SECRETS_FILE = r"C:\Users\Desmond\Downloads\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
 flow = Flow.from_client_secrets_file(
     CLIENT_SECRETS_FILE,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
@@ -103,8 +103,18 @@ def register():
 @app.route('/wishlist')
 def wishlist():
     username = session.get('username')
-    items = read_wishlist(username, "default").to_dict('records')
-    return render_template('./static/wishlist.html', data=items)
+    wishlist_name = session.get('wishlist_name', 'default')  # Or any other default
+    
+    # Fetch items from the wishlist
+    items = read_wishlist(username, wishlist_name)
+    
+    # Convert to dictionary records if the wishlist is not empty
+    if not items.empty:
+        items = items.to_dict('records')
+    else:
+        items = []  # Provide an empty list if the wishlist has no items
+    
+    return render_template('wishlist.html', items=items)
 
 @app.route('/share', methods=['POST'])
 def share():
