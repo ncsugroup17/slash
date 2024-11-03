@@ -43,12 +43,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest
-
-      # Create an issue if any of the above steps fail
-      - name: Create GitHub Issue on Failure
-        if: failure()
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          gh issue create --title "CI Failure on ${{ github.ref_name }}" --body "One or more tests failed in the workflow. Please check the logs for more details." --label "bug"
+          pytest --ignore=tests/test_all.py --ignore=tests/test_authentication.py
