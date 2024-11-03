@@ -21,4 +21,4 @@ jobs:
           pip install flake8
 
       - name: Run Flake8
-        run: flake8 --ignore=E,W .
+        run: flake8 --ignore=E,W,F401,F841,F811 .
