@@ -9,7 +9,9 @@ class CSVWriter:
         if not os.path.exists(self.filename):
             with open(self.filename, mode='w', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow(['product_id', 'username', 'comment'])  # Column headers
+                writer.writerow(
+                    ['product_id', 'username', 'comment']
+                )  # Column headers
 
     def add_comment(self, product_id, username, comment):
         """

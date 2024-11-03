@@ -77,7 +77,6 @@ def searchAmazon(query, df_flag, currency):
     return products
 
 
-
 def searchWalmart(query, df_flag, currency):
     """
     Scrapes walmart.com for products matching the search query.

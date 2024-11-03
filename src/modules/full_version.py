@@ -57,7 +57,8 @@ class FullVersion:
         prod = input("Enter name of product to Search: ")
         self.scrape(prod)
         ch = input(
-            "\nEnter 1 to save product to wishlist \nEnter 2 to open link in browser\nElse enter any other key to continue\n"
+            "\nEnter 1 to save product to wishlist \nEnter 2 to open link in browser\n"
+            "Else enter any other key to continue\n"
         )
         try:
             ch = int(ch)
@@ -83,7 +84,8 @@ class FullVersion:
         wish_lists = self.wishlist_maker()
         wishlist_options = int(
             input(
-                "\nSelect from the following: \n1. Open Wishlist \n2. Create new Wishlist \n3. Delete Wishlist \n4. Return to Main\n"
+                "\nSelect from the following: \n1. Open Wishlist \n2. Create new Wishlist "
+                "\n3. Delete Wishlist \n4. Return to Main\n"
             )
         )
 
@@ -98,7 +100,8 @@ class FullVersion:
                     print("Empty Wishlist")
                 choice = int(
                     input(
-                        "\nSelect from the following:\n1. Delete item from list\n2. Open link in Chrome\n3. Return to Main\n"
+                        "\nSelect from the following:\n1. Delete item from list\n2. Open link in Chrome\n"
+                        "3. Return to Main\n"
                     )
                 )
                 if choice == 1:

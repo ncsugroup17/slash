@@ -76,7 +76,8 @@ def list_wishlists(email):
     """
     user_dir = usr_dir(email)
     wishlists = [
-        wishlist.replace(".csv", "") for wishlist in os.listdir(user_dir) if wishlist.endswith(".csv")
+        wishlist.replace(".csv", "") for wishlist in os.listdir(user_dir)
+        if wishlist.endswith(".csv")
     ]
     return wishlists
 
@@ -147,7 +148,9 @@ def share_wishlist(email_sender, wishlist_name, email_receiver):
             subject = f'Slash wishlist of {email_sender}'
             df = pd.read_csv(wishlist_path)
             links_list = df['link'].astype(str).str.cat(sep=' ')
-            body = "\n".join([f"{i}. {link}" for i, link in enumerate(links_list.split(), start=1)])
+            body = "\n".join([
+                f"{i}. {link}" for i, link in enumerate(links_list.split(), start=1)
+            ])
 
             em = EmailMessage()
             em['From'] = email_sender
@@ -196,6 +199,8 @@ def update_price(link, website, price):
         scraped_price = scraper.target_scraper(link).strip()
 
     if scraped_price:
-        updated_price = scraper.getCurrency(currency, scraped_price) if currency else scraped_price
+        updated_price = (
+            scraper.getCurrency(currency, scraped_price) if currency else scraped_price
+        )
 
     return updated_price
