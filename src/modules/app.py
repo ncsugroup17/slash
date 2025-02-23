@@ -6,7 +6,7 @@ See the LICENSE file in the project root for the full license information.
 
 import os
 import csv
-from flask import Flask, session, render_template, request, redirect, url_for
+from flask import Flask, session, render_template, request, redirect, url_for, jsonify
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport import requests
@@ -23,7 +23,7 @@ app.secret_key = Config.SECRET_KEY
 
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-CLIENT_SECRETS_FILE = r"C:\Users\Desmond\Desktop\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
+CLIENT_SECRETS_FILE = r"C:\Users\cdmic\OneDrive\Desktop\Project_2\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
 flow = Flow.from_client_secrets_file(
     CLIENT_SECRETS_FILE,
     scopes=[
@@ -54,6 +54,13 @@ def load_comments():
     except ValueError as e:
         print(f"Error in loading comments: {e}")
     return comments
+
+# Sample product data
+products = {
+    '1': {'id': '1', 'title': 'Product 1', 'price': '$10', 'link': 'http://example.com/product1', 'website': 'Example', 'rating': '4.5'},
+    '2': {'id': '2', 'title': 'Product 2', 'price': '$20', 'link': 'http://example.com/product2', 'website': 'Example', 'rating': '4.0'},
+    # Add more products as needed
+}
 
 # Routes
 
@@ -104,15 +111,6 @@ def register():
             return redirect(url_for('login'))
         return render_template("./static/landing.html", login=False, invalid=True)
     return render_template('./static/login.html')
-
-
-@app.route('/wishlist')
-def wishlist():
-    username = session.get('username')
-    wishlist_name = session.get('wishlist_name', 'default')
-    items = read_wishlist(username, wishlist_name)
-    items = items.to_dict('records') if not items.empty else []
-    return render_template('wishlist.html', items=items)
 
 
 @app.route('/share', methods=['POST'])
@@ -184,17 +182,35 @@ def product_search_filtered():
         min_price, max_price, min_rating
     )
 
+@app.route('/wishlist')
+def wishlist():
+    wishlist_items = session.get('wishlist', [])
+    wishlist_products = [products[product_id] for product_id in wishlist_items if product_id in products]
+    return render_template('wishlist.html', data=wishlist_products)
 
-@app.route("/add-wishlist-item", methods=["POST"])
-def add_wishlist_item():
-    wishlist_add_item(session['username'], 'default', request.form.to_dict())
-    return ""
 
+@app.route('/add-to-wishlist', methods=['POST'])
+def add_to_wishlist():
+    product_id = request.json.get('id')
+    if 'wishlist' not in session:
+        session['wishlist'] = []
+    session['wishlist'].append(product_id)
+    return jsonify({'status': 'success'}), 200
 
 @app.route("/delete-wishlist-item", methods=["POST"])
 def remove_wishlist_item():
     wishlist_remove_list(session['username'], 'default', int(request.form["index"]))
     return redirect(url_for('wishlist'))
+
+
+@app.route('/add-wishlist-item', methods=['POST'])
+def add_wishlist_item():
+    product_id = request.form.get('id')
+    product_title = request.form.get('title')
+    if 'wishlist' not in session:
+        session['wishlist'] = []
+    session['wishlist'].append(product_id)
+    return 'Item added to wishlist', 200
 
 
 if __name__ == '__main__':

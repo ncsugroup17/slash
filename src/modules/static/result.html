@@ -196,67 +196,65 @@
   <div class="container">
     <div class="grid">
       {% for product in data %}
-      <div class="card-wrapper">
-        <div class="card-img-holder">
-          <img class="card-img" src="{{ product.img_link }}" alt="Product Image">
-        </div>
-        <div class="card-content">
-          <span class="card-website">{{ product.website }}</span>
-          <h4 class="card-price">{{ product.price }}</h4>
-          <p class="card-title">{{ product.title }}</p>
-          <div class="card-bottom">
-            <div class="card-rating">Rating: {{ product.rating }}</div>
-            <div class="card-buttons">
-              <a href="{{ product.link }}" target="_blank"><i class="fa fa-link"></i></a>
-              <a href="#/" id="heart-link"><i class="fa fa-heart"></i></a>
-              <!-- Button to open the comment popup -->
+        <div class="card-wrapper">
+          <div class="card-img-holder">
+            <img class="card-img" src="{{ product.img_link }}" alt="Product Image">
+          </div>
+          <div class="card-content">
+            <span class="card-website">{{ product.website }}</span>
+            <h4 class="card-price">{{ product.price }}</h4>
+            <p class="card-title">{{ product.title }}</p>
+            <div class="card-bottom">
+              <div class="card-rating">Rating: {{ product.rating }}</div>
+              <div class="card-buttons">
+                <a href="{{ product.link }}" target="_blank"><i class="fa fa-link"></i></a>
+                <a href="#/" id="heart-link"><i class="fa fa-heart"></i></a>
+                 <!-- Button to open the comment popup -->
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#commentModal{{ loop.index }}">
                 Comment
               </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
   
-      <!-- Comment Modal for each product -->
-      <div class="modal fade" id="commentModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel{{ loop.index }}" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="commentModalLabel{{ loop.index }}">Comments for {{ product.title }}</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <!-- Display Existing Comments -->
-              {% if comments[product.title] %}
-                <h6>Previous Comments:</h6>
-                <ul>
-                  {% for comment in comments[product.title] %}
-                  <li><strong>{{ comment.username }}:</strong> {{ comment.comment }}</li>
-                  {% endfor %}
-                </ul>
-              {% else %}
-                <p>No comments yet.</p>
-              {% endif %}
-  
-              <!-- Add New Comment Form -->
-              <form action="/add_comment" method="POST">
-                <input type="hidden" name="product_name" value="{{ product.title }}">
-                <div class="form-group">
-                  <label for="comment">Your Comment:</label>
-                  <textarea class="form-control" id="comment" name="comment" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Comment</button>
-              </form>
-            </div>
-          </div>
+  <!-- Comment Modal for each product -->
+  <div class="modal fade" id="commentModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel{{ loop.index }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="commentModalLabel{{ loop.index }}">Comments for {{ product.title }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          {% if comments[product.title] %}
+            <h6>Previous Comments:</h6>
+            <ul>
+              {% for comment in comments[product.title] %}
+                <li><strong>{{ comment.username }}:</strong> {{ comment.comment }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+           <p>No comments yet.</p>
+          {% endif %}
+
+        <form action="/add_comment" method="POST">
+          <input type="hidden" name="product_name" value="{{ product.title }}">
+          <div class="form-group">
+            <label for="comment">Your Comment:</label>
+            <textarea class="form-control" id="comment" name="comment" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Comment</button>
+        </form>
       </div>
-      {% endfor %}
     </div>
   </div>
+</div>
+{% endfor %}
+</div>
+</div>
   
 
   
@@ -439,9 +437,6 @@ cheapestProductDiv.style.boxShadow = "1 0 10px rgba(144, 238, 144, 0.6)"; // Lig
 
 
 
-  
-
-
   </header>
 
 
@@ -451,10 +446,10 @@ cheapestProductDiv.style.boxShadow = "1 0 10px rgba(144, 238, 144, 0.6)"; // Lig
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    integrity="sha384-UO2eT0CpHqdSJ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
     crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    integrity="sha384-JjSmVgyd0p3Xb1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
 
   <script>
@@ -503,9 +498,6 @@ cheapestProductDiv.style.boxShadow = "1 0 10px rgba(144, 238, 144, 0.6)"; // Lig
 
 
   <script>
-
-
-
     function addToCart(heartLink, product_data, e) {
       if (e.target && e.target.classList && !e.target.classList.contains("clicked-heart")) {
         e.target.classList.add("clicked-heart");
@@ -540,6 +532,25 @@ cheapestProductDiv.style.boxShadow = "1 0 10px rgba(144, 238, 144, 0.6)"; // Lig
       }
     })
   </script>
+  <script>
+function addToWishlist(productId, productTitle) {
+    const data = new FormData();
+    data.append('id', productId);
+    data.append('title', productTitle);
+
+    fetch('/add-wishlist-item', {
+        method: 'POST',
+        body: data
+    })
+    .then(response => response.text())
+    .then(result => {
+        alert("Added to wishlist!");
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
 </body>
 
 </html>
