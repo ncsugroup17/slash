@@ -434,3 +434,4 @@ def driver(product, currency, num=None, df_flag=0, csv=False, cd=None, ui=False,
             result_condensed.to_csv(file_name, index=False, header=result_condensed.columns)
             print(result_condensed)
         return result_condensed
+#
