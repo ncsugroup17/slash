@@ -208,6 +208,16 @@
               <div class="card-rating">Rating: {{ product.rating }}</div>
               <div class="card-buttons">
                 <a href="{{ product.link }}" target="_blank"><i class="fa fa-link"></i></a>
+                <a href="javascript:void(0);" 
+                    class="add-to-wishlist" 
+                    data-id="{{ product.id }}" 
+                    data-title="{{ product.title }}" 
+                    data-img="{{ product.img_link }}" 
+                    data-price="{{ product.price }}" 
+                    data-website="{{ product.website }}" 
+                    data-rating="{{ product.rating }}">
+                    <i class="fa fa-heart"></i> Add to Wishlist
+                </a>
                 <a href="#/" id="heart-link"><i class="fa fa-heart"></i></a>
                  <!-- Button to open the comment popup -->
               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#commentModal{{ loop.index }}">
@@ -533,23 +543,39 @@ cheapestProductDiv.style.boxShadow = "1 0 10px rgba(144, 238, 144, 0.6)"; // Lig
     })
   </script>
   <script>
-function addToWishlist(productId, productTitle) {
-    const data = new FormData();
-    data.append('id', productId);
-    data.append('title', productTitle);
+  document.addEventListener("DOMContentLoaded", function() {
+  // Listen for clicks on the Add to Wishlist link
+  document.querySelectorAll('.add-to-wishlist').forEach(function(button) {
+    button.addEventListener('click', function(event) {
+        var productId = event.target.getAttribute('data-id');
+        var productTitle = event.target.getAttribute('data-title');
+        var productImg = event.target.getAttribute('data-img');  // Get image link
+        var productPrice = event.target.getAttribute('data-price');
+        var productWebsite = event.target.getAttribute('data-website');
+        var productRating = event.target.getAttribute('data-rating');
 
-    fetch('/add-wishlist-item', {
-        method: 'POST',
-        body: data
-    })
-    .then(response => response.text())
-    .then(result => {
-        alert("Added to wishlist!");
-    })
-    .catch(error => {
-        console.error('Error:', error);
+        fetch('/add-wishlist-item', {
+            method: 'POST',
+            body: new URLSearchParams({
+                'id': productId,
+                'title': productTitle,
+                'img_link': productImg,
+                'price': productPrice,
+                'website': productWebsite,
+                'rating': productRating
+            }),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => console.error('Error:', error));
     });
-}
+  });
+  });
 </script>
 </body>
 
