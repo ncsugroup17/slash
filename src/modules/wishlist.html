@@ -65,36 +65,37 @@ See the LICENSE file in the project root for the full license information.
             <table border='1' class="item-list">
                 <thead>
                     <tr>
-                        <td>S.No</td>
-                        <td>Title</td>
-                        <td>Price</td>
-                        <td>Website</td>
-                        <td>Rating</td>
-                        <td>Delete</td>
+                        <th>S.No</th>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Website</th>
+                        <th>Rating</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for product in data %}
+                    {% for item in items %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td><a href="{{ product.link }}" target="_blank">{{ product.title }}</a></td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.website }}</td>
-                        <td>{{ product.rating }}</td>
-                        <td> <span class="delete-icon" data-index="{{ loop.index }}"
-                                onclick="deleteItem(this)">&#x1F5D1;</span>
+                        <td><img src="{{ item.img_link }}" alt="Product Image" width="50"></td>
+                        <td><a href="{{ item.link }}" target="_blank">{{ item.title }}</a></td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.website }}</td>
+                        <td>{{ item.rating }}</td>
+                        <td>
+                            <form action="/remove-wishlist-item" method="POST">
+                                <input type="hidden" name="id" value="{{ item.id }}">
+                                <button type="submit">Remove</button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <form id="rm-wishlist-item" action="/delete-wishlist-item" method="post" hidden>
-                <input name="index" id="rm-wishlist-item-index">
-            </form>
         </div>
         <div class="col-md-4"></div>
     </div>
-
     <p class="w3-center"><a onclick="document.getElementById('id01').style.display='block'"
             class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">
             Share</a></p>
