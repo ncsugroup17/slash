@@ -38,7 +38,7 @@ See the LICENSE file in the project root for the full license information.
 
       
               {% if login %}
-              <p>Welcome, {{ session['username'] }}!</p>
+              <p>Welcome, {{ session['user_info'][1] }}!</p>
               <a href="{{ url_for('logout') }}">Logout</a>
           {% else %}
               <a href="{{ url_for('login_google') }}">
