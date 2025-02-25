@@ -3,7 +3,7 @@ Copyright (C) 2023 SE23-Team44
 Licensed under the MIT License.
 See the LICENSE file in the project root for the full license information.
 """
-
+import time
 import os
 import csv
 import pickle
@@ -26,7 +26,7 @@ WISHLIST_FILE = 'wishlist.pkl'
 
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-CLIENT_SECRETS_FILE = r"C:\Users\cdmic\OneDrive\Desktop\Project_2\slash\src\client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
+CLIENT_SECRETS_FILE = r"/home/mesfand/Documents/slash/src/client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
 flow = Flow.from_client_secrets_file(
     CLIENT_SECRETS_FILE,
     scopes=[
@@ -138,12 +138,15 @@ def search():
         return render_template(
             "./static/result.html", error="Please enter a search term.", total_pages=0
         )
-
+    start_time = time.time()
     data = driver(product, currency=None)
     if data is None or data.empty:
         return render_template(
             "./static/result.html", error="No results found for your search.", total_pages=0
         )
+    end_time = time.time()
+    processing_time = end_time - start_time
+    print("Processing time:", processing_time, "seconds")
 
     comments = load_comments()
     total_pages = (len(data) + 19) // 20
