@@ -6,7 +6,8 @@ See the LICENSE file in the project root for the full license information.
 import time
 import os
 import csv
-from flask import Flask, session, render_template, request, redirect, url_for
+import pickle
+from flask import Flask, session, render_template, request, redirect, url_for, jsonify
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport import requests
@@ -20,6 +21,8 @@ from .config import Config
 # Initialize Flask app
 app = Flask(__name__, template_folder=".")
 app.secret_key = Config.SECRET_KEY
+
+WISHLIST_FILE = 'wishlist.pkl'
 
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -54,6 +57,13 @@ def load_comments():
     except ValueError as e:
         print(f"Error in loading comments: {e}")
     return comments
+
+# Sample product data
+products = {
+    '1': {'id': '1', 'title': 'Product 1', 'price': '$10', 'link': 'http://example.com/product1', 'website': 'Example', 'rating': '4.5'},
+    '2': {'id': '2', 'title': 'Product 2', 'price': '$20', 'link': 'http://example.com/product2', 'website': 'Example', 'rating': '4.0'},
+    # Add more products as needed
+}
 
 # Routes
 
@@ -104,15 +114,6 @@ def register():
             return redirect(url_for('login'))
         return render_template("./static/landing.html", login=False, invalid=True)
     return render_template('./static/login.html')
-
-
-@app.route('/wishlist')
-def wishlist():
-    username = session.get('username')
-    wishlist_name = session.get('wishlist_name', 'default')
-    items = read_wishlist(username, wishlist_name)
-    items = items.to_dict('records') if not items.empty else []
-    return render_template('wishlist.html', items=items)
 
 
 @app.route('/share', methods=['POST'])
@@ -187,16 +188,61 @@ def product_search_filtered():
         min_price, max_price, min_rating
     )
 
+@app.route("/wishlist")
+def wishlist():
+    wishlist_items = load_wishlist()  # Load items from the pickle file
+    return render_template("wishlist.html", items=wishlist_items)
 
-@app.route("/add-wishlist-item", methods=["POST"])
+# Function to load the wishlist from the pickle file
+def load_wishlist():
+    try:
+        with open(WISHLIST_FILE, 'rb') as f:
+            return pickle.load(f)
+    except (FileNotFoundError, EOFError):
+        return []
+
+# Function to save the wishlist to the pickle file
+def save_wishlist(wishlist):
+    with open(WISHLIST_FILE, 'wb') as f:
+        pickle.dump(wishlist, f)
+
+@app.route('/add-wishlist-item', methods=['POST'])
 def add_wishlist_item():
-    wishlist_add_item(session['username'], 'default', request.form.to_dict())
-    return ""
+    product_id = request.form.get('id')
+    product_title = request.form.get('title')
+    product_img = request.form.get('img_link')  # Get image link
+    product_price = request.form.get('price')
+    product_website = request.form.get('website')
+    product_rating = request.form.get('rating')
 
+    wishlist = load_wishlist()  # Load wishlist from the pickle file
+    # Add new product with image and other details
+    product = {
+        'id': product_id,
+        'title': product_title,
+        'img_link': product_img,
+        'price': product_price,
+        'website': product_website,
+        'rating': product_rating
+    }
+    wishlist.append(product)
+    save_wishlist(wishlist)
 
-@app.route("/delete-wishlist-item", methods=["POST"])
+    return jsonify({'message': 'Product added to wishlist!'})
+
+@app.route('/remove-wishlist-item', methods=['POST'])
 def remove_wishlist_item():
-    wishlist_remove_list(session['username'], 'default', int(request.form["index"]))
+    product_id = str(request.form.get('id'))  # Ensure it's a string
+
+    wishlist = load_wishlist()
+    print("Before Deletion:", wishlist)  # Debugging line
+
+    # Convert stored IDs to strings to ensure proper comparison
+    wishlist = [item for item in wishlist if str(item['id']) != product_id]
+
+    print("After Deletion:", wishlist)  # Debugging line
+
+    save_wishlist(wishlist)
     return redirect(url_for('wishlist'))
 
 

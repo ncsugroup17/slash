@@ -248,6 +248,7 @@ footer a {
     }
 }
 
+/* Style for the item list table */
 .item-list {
     text-align: center;
     width: 100%;
@@ -264,13 +265,11 @@ th {
 .item-list tr:nth-child(odd) {
     background-color: rgb(23, 22, 23);
     color: whitesmoke;
-
 }
 
 .item-list tr:nth-child(even) {
     background-color: rgb(23, 22, 23);
     color: whitesmoke;
-
 }
 
 .col-sm {
