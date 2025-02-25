@@ -134,3 +134,4 @@ dmypy.json
 
 *.csv
 user_data.json
+database.db

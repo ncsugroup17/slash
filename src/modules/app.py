@@ -17,16 +17,18 @@ from .features import (
     read_wishlist, wishlist_remove_list, share_wishlist
 )
 from .config import Config
+from .DatabaseManager import DatabaseManager
 
 # Initialize Flask app
 app = Flask(__name__, template_folder=".")
 app.secret_key = Config.SECRET_KEY
+db = DatabaseManager()
 
 WISHLIST_FILE = 'wishlist.pkl'
 
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-CLIENT_SECRETS_FILE = r"/home/mesfand/Documents/slash/src/client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json"
+CLIENT_SECRETS_FILE = os.path.join(os.path.dirname(__file__), "..", "client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json")
 flow = Flow.from_client_secrets_file(
     CLIENT_SECRETS_FILE,
     scopes=[
@@ -98,11 +100,33 @@ def callback():
     id_info = id_token.verify_oauth2_token(
         credentials.id_token, request_session, flow.client_config['client_id']
     )
-    session['username'] = id_info['email']
-    session['user_info'] = {'name': id_info['name'], 'email': id_info['email']}
 
-    if not check_user(session['username'], None):
-        create_user(session['username'], None, name=id_info['name'])
+    
+    email = id_info.get("email")
+    full_name = id_info.get("name")
+    given_name = id_info.get("given_name")
+    family_name = id_info.get("family_name")
+    profile_picture_url = id_info.get("picture")
+    google_id = id_info.get("sub")  # Google unique user ID
+    email_verified = id_info.get("email_verified")
+
+    if db.user_exists(email):
+        db.update_last_login(email)
+        session['username'] = email
+        session['user_info'] = (email ,given_name)
+
+    else:
+        # Register new user
+        db.insert_user(
+            email=email,
+            full_name=full_name,
+            name=given_name,
+            email_verified=email_verified,
+            profile_picture_url=profile_picture_url,
+            google_id=google_id
+        )
+        session['username'] = email
+        session['user_info'] = (email ,given_name)
 
     return redirect(url_for("login"))
 
@@ -134,7 +158,7 @@ def search():
         return redirect(url_for('login'))
 
     product = request.args.get("product_name") or request.form.get("product_name")
-    if not product:
+    if not product or product == "":
         return render_template(
             "./static/result.html", error="Please enter a search term.", total_pages=0
         )
