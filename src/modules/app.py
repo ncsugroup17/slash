@@ -24,8 +24,6 @@ app = Flask(__name__, template_folder=".")
 app.secret_key = Config.SECRET_KEY
 db = DatabaseManager()
 
-wishlist = []
-
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 CLIENT_SECRETS_FILE = os.path.join(os.path.dirname(__file__), "..", "client_secret_92320207172-8cnk4c9unfaa7llua906p6kjvhnvkbqd.apps.googleusercontent.com.json")
@@ -68,6 +66,12 @@ products = {
 }
 
 # Routes
+
+@app.route('/initialize-db')
+def initialize_db_route():
+    print("Initialize DB route was called!")
+    db.create_tables()
+    return "Database tables created successfully!"
 
 @app.route('/')
 def landingpage():
@@ -212,13 +216,14 @@ def product_search_filtered():
         min_price, max_price, min_rating
     )
 
-def create_wishlist_table():
+def create_tables():
     conn = sqlite3.connect('your_database.db')
     cursor = conn.cursor()
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS wishlist (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
             title TEXT,
             image TEXT,
             price TEXT,
@@ -232,7 +237,7 @@ def create_wishlist_table():
     conn.close()
 
 # Call the function to create the table when the app starts
-create_wishlist_table()
+create_tables()
 
 
 @app.route('/wishlist')
@@ -250,48 +255,70 @@ def wishlist():
 
 @app.route('/add-wishlist-item', methods=['POST'])
 def add_to_wishlist():
-    title = request.form['title']
-    img = request.form['img']
-    price = request.form['price']
-    website = request.form['website']
-    rating = request.form['rating']
-    
-    conn = sqlite3.connect('your_database.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        INSERT INTO wishlist (title, image, price, website, rating)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (title, img, price, website, rating))
+    print("Session Data:", session)
 
-    conn.commit()
-    conn.close()
+    if 'username' not in session:
+        return jsonify({'error': 'Unauthorized access!'}), 401
 
-    return jsonify({"message": "Product added to wishlist!"})
+    user = db.get_user(session["user_info"][0])
+
+
+    if not user:
+        return jsonify({'error': 'User not found!'}), 404
+
+    user_id = user[0]  # Assuming user[0] is the user_id
+
+    title = request.form.get('title')
+    img = request.form.get('img')
+    price = request.form.get('price')
+    website = request.form.get('website')
+    rating = request.form.get('rating')
+
+    if not all([title, img, price, website, rating]):
+        return jsonify({'error': 'Missing data!'}), 400
+
+    try:
+        product = db.get_product(url=website)
+        if not product:
+            db.insert_product(
+                name=title, description="No description available", price=price,
+                currency="USD", rating=rating, num_reviews=0, url=website,
+                image_url=img, category="Unknown", source=website
+            )
+            product = db.get_product(url=website)
+
+        product_id = product[0]
+
+        if db.is_product_in_wishlist(user_id, product_id):
+            return jsonify({"error": "Product is already in wishlist!"}), 409
+
+        db.add_to_wishlist(user_id, product_id)
+        return jsonify({"message": "Product added to wishlist!"}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
+
 @app.route('/remove-wishlist-item', methods=['POST'])
 def remove_wishlist_item():
     if 'username' not in session:
         return jsonify({'error': 'Unauthorized access!'}), 403
-    
+
     product_id = request.form.get('id')
-    user = db.get_user(session['username'])
+    if not product_id:
+        return jsonify({'error': 'Invalid product ID!'}), 400
+
+    user = db.get_user(session["user_info"][0])
     if not user:
         return jsonify({'error': 'User not found!'}), 404
-    
-    user_id = user[0]
-    
-    try:
-        wishlist_items = db.get_wishlist(user_id)
-        if not any(item[0] == product_id for item in wishlist_items):
-            return jsonify({'error': 'Product not found in wishlist!'}), 404  # Not found status code
-        
-        # Remove the product from the user's wishlist in the database
-        db.cursor.execute("DELETE FROM wishlist WHERE user_id = ? AND product_id = ?", (user_id, product_id))
-        db.conn.commit()
 
-        return jsonify({'message': 'Product removed from wishlist!'}), 200  # OK status code
+    user_id = user[0]
+
+    try:
+        if not db.is_product_in_wishlist(user_id, product_id):
+            return jsonify({"error": "Product not in wishlist!"}), 404
+
+        db.remove_from_wishlist(user_id, product_id)
+        return jsonify({'message': 'Product removed from wishlist!'}), 200
     except Exception as e:
-        db.conn.rollback()
         return jsonify({'error': f'Failed to remove product: {str(e)}'}), 500
 
 

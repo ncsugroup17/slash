@@ -38,7 +38,7 @@
           <a class="nav-link" href="login">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="wishlist">Wishlist</a>
+          <a class="nav-link" href="wishlist">wishlist</a>
         </li>
       </ul>
 
@@ -542,30 +542,58 @@ cheapestProductDiv.style.boxShadow = "1 0 10px rgba(144, 238, 144, 0.6)"; // Lig
     })
   </script>
   <script>
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".add-to-wishlist").forEach(button => {
-        button.addEventListener("click", function () {
-            const productId = this.dataset.id;
-
-            fetch('/add-wishlist-item', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ id: productId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(`Error: ${data.error}`);
-                } else {
-                    alert(data.message);
-                    window.location.href = '/wishlist';
-                }
-            })
-            .catch(error => console.error("Error:", error));
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.add-to-wishlist').forEach(button => {
+            button.addEventListener('click', function () {
+                let productData = {
+                    title: this.dataset.title,
+                    img: this.dataset.img,
+                    price: this.dataset.price,
+                    website: this.dataset.website,
+                    rating: this.dataset.rating
+                };
+    
+                fetch('/add-wishlist-item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(productData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+    
+        document.querySelectorAll('.remove-from-wishlist').forEach(button => {
+            button.addEventListener('click', function () {
+                let productId = this.dataset.id;
+    
+                fetch('/remove-wishlist-item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: productId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        this.closest('li').remove(); // Remove the item from the DOM
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
         });
     });
-});
-</script>
+    </script>
+    
 
 
 </body>
