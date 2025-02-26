@@ -220,15 +220,9 @@ def product_search_filtered():
 
 @app.route('/wishlist')
 def wishlist():
-    conn = sqlite3.connect('your_database.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM wishlist')
-    products = cursor.fetchall()
-
-    conn.close()
-
-    return render_template('wishlist.html', products=products)
+    user = db.get_user(session['username'])
+    wishlist = db.get_wishlist(user[0])
+    return render_template('wishlist.html', products=wishlist)
 
 
 @app.route('/add-wishlist-item', methods=['POST'])
