@@ -183,6 +183,12 @@ class DatabaseManager:
         ''', (user_id, product_id))
         self.conn.commit()
 
+    def add_to_wishlist(self, user_id, product_id):
+    # Assuming you have a Wishlist table with columns for user_id and product_id
+        query = "INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)"
+        self.cursor.execute(query, (user_id, product_id))
+        self.conn.commit()
+
     ### COMMENTS MANAGEMENT ###
     def add_comment(self, user_id, product_id, comment, rating_given=None):
         """Adds a comment to a product."""
