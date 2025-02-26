@@ -1,6 +1,34 @@
 <!doctype html>
 <html lang="en">
 
+<style>
+    body {
+        color: #f8f9fa; /* Light text color */
+    }
+
+    .table th, .table td {
+        color: #f8f9fa; /* Light color for table headers and cells */
+    }
+
+    .navbar-nav .nav-link {
+        color: #f8f9fa !important; /* Ensures the navbar links are also light */
+    }
+
+    .remove-from-wishlist {
+        color: #f8f9fa; /* Light text color for the button */
+    }
+
+    /* For dark mode, you may want to adjust accordingly */
+    body.dark-mode {
+        color: #e0e0e0; /* Slightly darker text color in dark mode */
+    }
+
+    /* Blue color for the heading */
+    h1 {
+        color: #007bff; /* Blue color */
+    }
+</style>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -52,29 +80,30 @@
 
     <br><br><br>
 
-    <div class="results">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-            <h1>Your Wishlist</h1>
-            <ul>
+    <div class="container">
+        <h1>Your Wishlist</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Image</th>
+                    <th>Price</th>
+                    <th>Website</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for product in products %}
-                <li>
-                    <h2>{{ product[1] }}</h2>
-                    <img src="{{ product[8] }}" alt="{{ product[1] }}">
-                    <p>Price: {{ product[3] }}</p>
-                    <p>Website: {{ product[10] }}</p>
-                    <p>Rating: {{ product[5] }}</p>
-                    <form action="{{ url_for('remove_wishlist_item') }}" method="post">
-                        <input type="hidden" name="id" value="{{ product[0] }}">
-                        <button type="button" class="remove-from-wishlist btn btn-danger" data-id="{{ product[0] }}">
-                            Remove
-                        </button>
-                    </form>
-                </li>
+                <tr>
+                    <td>{{ product[1] }}</td>
+                    <td><img src="{{ product[8] }}" alt="{{ product[1] }}" width="100"></td>
+                    <td>{{ product[3] }}</td>
+                    <td>{{ product[10] }}</td>
+                    <td>{{ product[5] }}</td>
+                </tr>
                 {% endfor %}
-            </ul>
-        </div>
-        <div class="col-md-4"></div>
+            </tbody>
+        </table>
     </div>
 
     <p class="w3-center"><a onclick="document.getElementById('id01').style.display='block'"
