@@ -7,7 +7,7 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14029366.svg)](https://doi.org/10.5281/zenodo.14029366)
 ![Github](https://img.shields.io/badge/language-python-red.svg)
 [![Pylint](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml)
-[![Python Application](https://github.com/SDillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
+[![Python Application](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
 [![Running Code Coverage](https://github.com/DillonMichels/slash/actions/workflows/code_cov.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/code_cov.yml)
 [![OAuth and scrappers](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
 [![Python Style Checker](https://github.com/DillonMichels/slash/actions/workflows/style_checker.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/style_checker.yml)
