@@ -68,6 +68,9 @@ flask run
 
 Updated to use a Database, testing of the Database, Wishlist, and faster Web Scraper times.
 
+
+![alt text](/src/modules/static/images/wishlist.png)
+
 :sparkles: Contributors
 ---
 <table>
