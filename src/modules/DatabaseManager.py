@@ -166,28 +166,38 @@ class DatabaseManager:
     
     def is_product_in_wishlist(self, user_id, product_id):
         self.cursor.execute('''
-            SELECT 1 FROM wishlist WHERE user_id = ? AND product_id = ?
+            SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ?
         ''',    (user_id, product_id))
         return self.cursor.fetchone() is not None
 
-    def add_to_wishlist(self, user_id, title, image, price, website, rating):
-        self.cursor.execute('''
-            INSERT INTO wishlist (user_id, title, image, price, website, rating)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, title, image, price, website, rating))
-        self.conn.commit()
+    # def add_to_wishlist(self, user_id, title, image, price, website, rating):
+    #     self.cursor.execute('''
+    #         INSERT INTO wishlist (user_id, title, image, price, website, rating)
+    #         VALUES (?, ?, ?, ?, ?, ?)
+    #     ''', (user_id, title, image, price, website, rating))
+    #     self.conn.commit()
 
     def remove_from_wishlist(self, user_id, product_id):
         self.cursor.execute('''
-            DELETE FROM wishlist WHERE user_id = ? AND id = ?
+            DELETE FROM wishlists WHERE user_id = ? AND id = ?
         ''', (user_id, product_id))
         self.conn.commit()
 
     def add_to_wishlist(self, user_id, product_id):
-    # Assuming you have a Wishlist table with columns for user_id and product_id
-        query = "INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)"
-        self.cursor.execute(query, (user_id, product_id))
+        """Adds a product to the user's wishlists, preventing duplicates."""
+        self.cursor.execute("""
+            SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ?
+        """, (user_id, product_id))
+        
+        if self.cursor.fetchone():
+            return  # Product is already in the wishlist, do nothing
+
+        self.cursor.execute("""
+            INSERT INTO wishlists (user_id, product_id, added_on)
+            VALUES (?, ?, ?)
+        """, (user_id, product_id, datetime.now()))
         self.conn.commit()
+
 
     ### COMMENTS MANAGEMENT ###
     def add_comment(self, user_id, product_id, comment, rating_given=None):

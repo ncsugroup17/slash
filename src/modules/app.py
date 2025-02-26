@@ -216,28 +216,6 @@ def product_search_filtered():
         min_price, max_price, min_rating
     )
 
-def create_tables():
-    conn = sqlite3.connect('your_database.db')
-    cursor = conn.cursor()
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS wishlist (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            title TEXT,
-            image TEXT,
-            price TEXT,
-            website TEXT,
-            rating TEXT,
-            added_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-
-    conn.commit()
-    conn.close()
-
-# Call the function to create the table when the app starts
-create_tables()
 
 
 @app.route('/wishlist')
@@ -267,7 +245,7 @@ def add_to_wishlist():
         return jsonify({'error': 'User not found!'}), 404
 
     user_id = user[0]  # Assuming user[0] is the user_id
-
+    print("User ID:", user_id)
     title = request.form.get('title')
     img = request.form.get('img')
     price = request.form.get('price')
@@ -291,7 +269,7 @@ def add_to_wishlist():
 
         if db.is_product_in_wishlist(user_id, product_id):
             return jsonify({"error": "Product is already in wishlist!"}), 409
-
+        
         db.add_to_wishlist(user_id, product_id)
         return jsonify({"message": "Product added to wishlist!"}), 200
     except Exception as e:
