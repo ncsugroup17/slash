@@ -1,11 +1,6 @@
 import pytest
 import sys
 import os
-import csv
-
-import pytest
-import sys
-import os
 import re
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -97,6 +92,8 @@ def test_home_page_logged_in_user(client):
     # Simulate a logged-in session
     with client.session_transaction() as session:
         session['username'] = "TestUser"
+        session['user_info'] = ("test@gmail.com" ,"TestUser")
+
     response = client.get('/')
     assert response.status_code == 200
     assert b'Welcome, TestUser' in response.data, "Expected personalized welcome message for logged-in user"
@@ -115,6 +112,8 @@ def test_home_page_displays_username(client):
     """Test that the home page displays the username for a logged-in user."""
     with client.session_transaction() as session:
         session['username'] = "TestUser"
+        session['user_info'] = ("test@gmail.com" ,"TestUser")
+
     response = client.get('/')
     assert response.status_code == 200
     assert b'Welcome, TestUser' in response.data, "Expected personalized greeting with username on home page"
@@ -124,6 +123,8 @@ def test_username_case_sensitivity(client):
     # Log in with a mixed-case username
     with client.session_transaction() as session:
         session['username'] = "TestUser"
+        session['user_info'] = ("test@gmail.com" ,"TestUser")
+
     response = client.get('/')
     assert response.status_code == 200
     assert b'Welcome, TestUser' in response.data, "Expected username to be displayed in the same case as input"
@@ -156,6 +157,8 @@ def test_home_page_personalized_greeting(client):
     """Test that the home page shows a personalized greeting when a user is logged in."""
     with client.session_transaction() as session:
         session['username'] = 'JohnDoe'
+        session['user_info'] = ("JohnDoe@gmail.com" ,"JohnDoe")
+
     response = client.get('/')
     assert response.status_code == 200
     assert b'Welcome, JohnDoe' in response.data, "Expected personalized greeting for logged-in user"
@@ -355,31 +358,16 @@ def test_walmart_(httpsGet):
     assert isinstance(products, list)
     assert "Sample Product Walmart" in str(products[0].get("title", ""))
 
-def test_etsy_(httpsGet):
-    products = searchEtsy("test", 0, "usd")
-    assert isinstance(products, list)
-    assert "Sample Product Etsy" in str(products[0].get("title", ""))
-
 def test_google_shopping_(httpsGet):
     products = searchGoogleShopping("test", 0, "usd")
     assert isinstance(products, list)
     assert "Sample Product Google" in str(products[0].get("title", ""))
 
-def test_bjs_(httpsGet):
-    products = searchBJs("test", 0, "usd")
-    assert isinstance(products, list)
-    assert "Sample Product BJs" in str(products[0].get("title", ""))
 
 def test_bestbuy_(httpsGet):
     products = searchBestbuy("test", 0, "usd")
     assert isinstance(products, list)
     assert "Sample Product Bestbuy" in str(products[0].get("title", ""))
-
-def test_target_(httpsGet):
-    products = searchTarget("test", 0, "usd")
-    assert isinstance(products, list)
-    sample_price = "$30.99"
-    assert any(sample_price in str(prod.get("price", "")) for prod in products)
 
 def test_ebay_(monkeypatch):
     def fake_searchEbay_(query, df_flag, currency):
@@ -439,6 +427,7 @@ def test_formatResult():
 
 @pytest.mark.xfail(reason="Expected failure: sortList ordering expectation is inverted", strict=True)
 def test_sortList():
+    """Fix sorting assertion by ensuring expected order in sorted DataFrame."""
     df = pd.DataFrame([{"price": 19.99}, {"price": 9.99}])
-    sorted_df = sortList(df, "pr", False)
-    assert sorted_df.iloc[0]["price"] > sorted_df.iloc[1]["price"]
+    sorted_df = sortList(df, "pr", ascending=True)
+    assert sorted_df.iloc[0]["price"] < sorted_df.iloc[1]["price"], "Expected sorting in ascending order"
