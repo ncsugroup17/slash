@@ -7,6 +7,8 @@ class DatabaseManager:
         self.db_file = db_file
         self.conn = sqlite3.connect(self.db_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
+        self.cursor.execute("PRAGMA foreign_keys = ON;")
+
         self.create_tables()
 
     def create_tables(self):

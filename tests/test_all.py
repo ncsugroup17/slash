@@ -1,11 +1,6 @@
 import pytest
 import sys
 import os
-import csv
-
-import pytest
-import sys
-import os
 import re
 import pandas as pd
 from bs4 import BeautifulSoup
