@@ -17,7 +17,7 @@ Ensure you have the following installed:
 Clone the repository from GitHub. Open a terminal and run:
 
 ```bash
-git clone https://github.com/SE-Fall-2024-Team-69/slash.git
+git clone https://github.com/DillonMichels/slash
 cd slash
 git checkout main
 ```
