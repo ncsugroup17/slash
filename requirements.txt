@@ -14,3 +14,4 @@ pyOpenSSL==19.0.0
 Flask-Login==0.4.1
 google-auth-oauthlib==1.2.1
 google-auth-httplib2==0.2.0
+pytest-cov
