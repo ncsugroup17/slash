@@ -16,7 +16,7 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 [![GitHub issues](https://img.shields.io/github/issues/DillonMichels/slash)](https://github.com/DillonMichels/slash/issues)
 [![Github closes issues](https://img.shields.io/github/issues-closed-raw/DillonMichels/slash)](https://github.com/DillonMichels/slash/issues?q=is%3Aissue+is%3Aclosed)
 [![Github closed pull requests](https://img.shields.io/github/issues-pr-closed/DillonMichels/slash)](https://github.com/DillonMichels/slash/pulls?q=is%3Apr+is%3Aclosed)
-<a href="https://github.com/DillonMichels/slash/network"><img alt="GitHub forks" src="https://github.com/DillonMichels/slash"></a>
+<a href="https://github.com/DillonMichels/slash/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/DillonMichels/slash"></a>
 <a href="https://github.com/DillonMichels/slash/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/DillonMichels/slash"></a>
 ![Discord](https://img.shields.io/discord/1162231656980168876)
 
