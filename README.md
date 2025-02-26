@@ -4,7 +4,7 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 <p align="center"><img width="500" src="./assets/Shop.gif"></p>
 
 [![GitHub license](https://img.shields.io/github/license/DillonMichels/slash)](https://github.com/DillonMichels/slash/blob/main/LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14029366.svg)](https://doi.org/10.5281/zenodo.14029366)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14932526.svg)](https://doi.org/10.5281/zenodo.14932526)
 ![Github](https://img.shields.io/badge/language-python-red.svg)
 [![Pylint](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml)
 [![Python Application](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
