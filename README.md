@@ -3,21 +3,21 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 
 <p align="center"><img width="500" src="./assets/Shop.gif"></p>
 
-[![GitHub license](https://img.shields.io/github/license/SE-Fall-2024-Team-69/slash)](https://github.com/SE-Fall-2024-Team-69/slash/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/DillonMichels/slash)](https://github.com/DillonMichels/slash/blob/main/LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14029366.svg)](https://doi.org/10.5281/zenodo.14029366)
 ![Github](https://img.shields.io/badge/language-python-red.svg)
-[![Pylint](https://github.com/SE23-Team44/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/pylint.yml)
-[![Python Application](https://github.com/SE23-Team44/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/python-package.yml)
-[![Running Code Coverage](https://github.com/SE23-Team44/slash/actions/workflows/code_cov.yml/badge.svg)](https://github.com/SE23-Team44/slash/actions/workflows/code_cov.yml)
-[![OAuth and scrappers](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/python-package.yml)
-[![Python Style Checker](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/style_checker.yml/badge.svg)](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/style_checker.yml)
-[![Format Check](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/code_formatter.yml/badge.svg)](https://github.com/SE-Fall-2024-Team-69/slash/actions/workflows/code_formatter.yml)
+[![Pylint](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml)
+[![Python Application](https://github.com/SDillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
+[![Running Code Coverage](https://github.com/DillonMichels/slash/actions/workflows/code_cov.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/code_cov.yml)
+[![OAuth and scrappers](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
+[![Python Style Checker](https://github.com/DillonMichels/slash/actions/workflows/style_checker.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/style_checker.yml)
+[![Format Check](https://github.com/DillonMichels/slash/actions/workflows/code_formatter.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/code_formatter.yml)
 
-[![GitHub issues](https://img.shields.io/github/issues/SE23-Team44/slash)](https://github.com/SE23-Team44/slash/issues)
-[![Github closes issues](https://img.shields.io/github/issues-closed-raw/SE23-Team44/slash)](https://github.com/SE23-Team44/slash/issues?q=is%3Aissue+is%3Aclosed)
-[![Github closed pull requests](https://img.shields.io/github/issues-pr-closed/SE23-Team44/slash)](https://github.com/SE23-Team44/slash/pulls?q=is%3Apr+is%3Aclosed)
+[![GitHub issues](https://img.shields.io/github/issues/DillonMichels/slash)](https://github.com/DillonMichels/slash/issues)
+[![Github closes issues](https://img.shields.io/github/issues-closed-raw/DillonMichels/slash)](https://github.com/DillonMichels/slash/issues?q=is%3Aissue+is%3Aclosed)
+[![Github closed pull requests](https://img.shields.io/github/issues-pr-closed/DillonMichels/slash)](https://github.com/DillonMichels/slash/pulls?q=is%3Apr+is%3Aclosed)
 <a href="https://github.com/DillonMichels/slash"><img alt="GitHub forks" src="https://github.com/DillonMichels/slash"></a>
-<a href="https://github.com/SE23-Team44/slasg/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/SE23-Team44/slash"></a>
+<a href="https://github.com/DillonMichels/slash/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/DillonMichels/slash"></a>
 ![Discord](https://img.shields.io/discord/1162231656980168876)
 
 Slash is a powerful tool designed to scrape leading e-commerce websites to find the best deals on products you're searching for. It currently supports popular platforms including [Walmart](https://www.walmart.com/), [Target](https://www.target.com/), [BestBuy](https://www.bestbuy.com/),  [Amazon](https://www.amazon.com/), [Google Shopping](https://shopping.google.com/),  [BJs](https://www.bjs.com/),  [Etsy](https://www.etsy.com/), and [EBay](https://www.ebay.com/).
@@ -72,9 +72,6 @@ Updated to use a Database, testing of the Database, Wishlist, and faster Web Scr
 ---
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/yaswanth67"><img src="https://avatars.githubusercontent.com/u/66238314?v=4" width="75px;" alt=""/><br /><sub><b>Yaswanth Baddi</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/YaswanthMullamuri"><img src="https://avatars.githubusercontent.com/u/55339925?v=4" width="75px;" alt=""/><br /><sub><b>Yaswanth Mullamuri</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/AyushGupta-Code"><img src="https://avatars.githubusercontent.com/u/70428309?v=4" width="75px;" alt=""/><br /><sub><b>Ayush Gupta</b></sub></a></td>
     <td align="center"><a href="https://github.com/Mohsen-Esfandyari"><img src="https://avatars.githubusercontent.com/u/166367760?v=4" width="75px;" alt=""/><br /><sub><b>Mohsen-Esfandyari</b></sub></a></td>
     <td align="center"><a href="https://github.com/ali-f-alfa"><img src="https://avatars.githubusercontent.com/u/45769531?v=4" width="75px;" alt=""/><br /><sub><b>Ali Farahat</b></sub></a></td>
     <td align="center"><a href="https://github.com/DillonMichels"><img src="https://avatars.githubusercontent.com/u/88557889?v=4" width="75px;" alt=""/><br /><sub><b>Dillon Michels</b></sub></a></td>
