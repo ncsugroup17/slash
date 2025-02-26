@@ -6,7 +6,7 @@ See the LICENSE file in the project root for the full license information.
 import time
 import os
 import csv
-import pickle
+import sqlite3
 from flask import Flask, session, render_template, request, redirect, url_for, jsonify
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
@@ -23,8 +23,6 @@ from .DatabaseManager import DatabaseManager
 app = Flask(__name__, template_folder=".")
 app.secret_key = Config.SECRET_KEY
 db = DatabaseManager()
-
-WISHLIST_FILE = 'wishlist.pkl'
 
 # Google OAuth2 setup (Use secure transport in production)
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -68,6 +66,12 @@ products = {
 }
 
 # Routes
+
+@app.route('/initialize-db')
+def initialize_db_route():
+    print("Initialize DB route was called!")
+    db.create_tables()
+    return "Database tables created successfully!"
 
 @app.route('/')
 def landingpage():
@@ -212,62 +216,82 @@ def product_search_filtered():
         min_price, max_price, min_rating
     )
 
-@app.route("/wishlist")
+
+
+@app.route('/wishlist')
 def wishlist():
-    wishlist_items = load_wishlist()  # Load items from the pickle file
-    return render_template("wishlist.html", items=wishlist_items)
+    user = db.get_user(session['username'])
+    wishlist = db.get_wishlist(user[0])
+    return render_template('wishlist.html', products=wishlist)
 
-# Function to load the wishlist from the pickle file
-def load_wishlist():
-    try:
-        with open(WISHLIST_FILE, 'rb') as f:
-            return pickle.load(f)
-    except (FileNotFoundError, EOFError):
-        return []
-
-# Function to save the wishlist to the pickle file
-def save_wishlist(wishlist):
-    with open(WISHLIST_FILE, 'wb') as f:
-        pickle.dump(wishlist, f)
 
 @app.route('/add-wishlist-item', methods=['POST'])
-def add_wishlist_item():
-    product_id = request.form.get('id')
-    product_title = request.form.get('title')
-    product_img = request.form.get('img_link')  # Get image link
-    product_price = request.form.get('price')
-    product_website = request.form.get('website')
-    product_rating = request.form.get('rating')
+def add_to_wishlist():
+    print("Session Data:", session)
 
-    wishlist = load_wishlist()  # Load wishlist from the pickle file
-    # Add new product with image and other details
-    product = {
-        'id': product_id,
-        'title': product_title,
-        'img_link': product_img,
-        'price': product_price,
-        'website': product_website,
-        'rating': product_rating
-    }
-    wishlist.append(product)
-    save_wishlist(wishlist)
+    if 'username' not in session:
+        return jsonify({'error': 'Unauthorized access!'}), 401
 
-    return jsonify({'message': 'Product added to wishlist!'})
+    user = db.get_user(session["user_info"][0])
+
+
+    if not user:
+        return jsonify({'error': 'User not found!'}), 404
+
+    user_id = user[0]  # Assuming user[0] is the user_id
+    print("User ID:", user_id)
+    title = request.form.get('title')
+    img = request.form.get('img')
+    price = request.form.get('price')
+    website = request.form.get('website')
+    rating = request.form.get('rating')
+
+    if not all([title, img, price, website, rating]):
+        return jsonify({'error': 'Missing data!'}), 400
+
+    try:
+        product = db.get_product(url=website)
+        if not product:
+            db.insert_product(
+                name=title, description="No description available", price=price,
+                currency="USD", rating=rating, num_reviews=0, url=website,
+                image_url=img, category="Unknown", source=website
+            )
+            product = db.get_product(url=website)
+
+        product_id = product[0]
+
+        if db.is_product_in_wishlist(user_id, product_id):
+            return jsonify({"error": "Product is already in wishlist!"}), 409
+        
+        db.add_to_wishlist(user_id, product_id)
+        return jsonify({"message": "Product added to wishlist!"}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
 
 @app.route('/remove-wishlist-item', methods=['POST'])
 def remove_wishlist_item():
-    product_id = str(request.form.get('id'))  # Ensure it's a string
+    if 'username' not in session:
+        return jsonify({'error': 'Unauthorized access!'}), 403
 
-    wishlist = load_wishlist()
-    print("Before Deletion:", wishlist)  # Debugging line
+    product_id = request.form.get('id')
+    if not product_id:
+        return jsonify({'error': 'Invalid product ID!'}), 400
 
-    # Convert stored IDs to strings to ensure proper comparison
-    wishlist = [item for item in wishlist if str(item['id']) != product_id]
+    user = db.get_user(session["user_info"][0])
+    if not user:
+        return jsonify({'error': 'User not found!'}), 404
 
-    print("After Deletion:", wishlist)  # Debugging line
+    user_id = user[0]
 
-    save_wishlist(wishlist)
-    return redirect(url_for('wishlist'))
+    try:
+        if not db.is_product_in_wishlist(user_id, product_id):
+            return jsonify({"error": "Product not in wishlist!"}), 404
+
+        db.remove_from_wishlist(user_id, product_id)
+        return jsonify({'message': 'Product removed from wishlist!'}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to remove product: {str(e)}'}), 500
 
 
 if __name__ == '__main__':

@@ -1,10 +1,3 @@
-<!--
-Copyright (C) 2023 SE23-Team44
-
-Licensed under the MIT License.
-See the LICENSE file in the project root for the full license information.
--->
-
 <!doctype html>
 <html lang="en">
 
@@ -42,72 +35,58 @@ See the LICENSE file in the project root for the full license information.
                     <a class="nav-link">Welcome {{ session['username'] }}</a>
                 </li>
                 <li class="nav-item">
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href={{ url_for('logout') }}>Logout</a>
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                 </li>
             </ul>
         </div>
         <div>
             <label class="switch" id="toggle-button">
-              <input type="checkbox">
-              <span class="slider round">
-                <span class="icon" id="moon">&#127770;</span>
-                <span class="icon" id="sun">&#9728;</span>
-              </span>
+                <input type="checkbox">
+                <span class="slider round">
+                    <span class="icon" id="moon">&#127770;</span>
+                    <span class="icon" id="sun">&#9728;</span>
+                </span>
             </label>
         </div>
     </nav>
+
     <br><br><br>
+
     <div class="results">
         <div class="col-md-4"></div>
         <div class="col-md-4">
-            <table border='1' class="item-list">
-                <thead>
-                    <tr>
-                        <th>S.No</th>
-                        <th>Image</th>
-                        <th>Title</th>
-                        <th>Price</th>
-                        <th>Website</th>
-                        <th>Rating</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td><img src="{{ item.img_link }}" alt="Product Image" width="50"></td>
-                        <td><a href="{{ item.link }}" target="_blank">{{ item.title }}</a></td>
-                        <td>{{ item.price }}</td>
-                        <td>{{ item.website }}</td>
-                        <td>{{ item.rating }}</td>
-                        <td>
-                            <form action="/remove-wishlist-item" method="POST">
-                                <input type="hidden" name="id" value="{{ item.id }}">
-                                <button type="submit">Remove</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h1>Your Wishlist</h1>
+            <ul>
+                {% for product in products %}
+                <li>
+                    <h2>{{ product[1] }}</h2>
+                    <img src="{{ product[8] }}" alt="{{ product[1] }}">
+                    <p>Price: {{ product[3] }}</p>
+                    <p>Website: {{ product[10] }}</p>
+                    <p>Rating: {{ product[5] }}</p>
+                    <form action="{{ url_for('remove_wishlist_item') }}" method="post">
+                        <input type="hidden" name="id" value="{{ product[0] }}">
+                        <button type="button" class="remove-from-wishlist btn btn-danger" data-id="{{ product[0] }}">
+                            Remove
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
         <div class="col-md-4"></div>
     </div>
+
     <p class="w3-center"><a onclick="document.getElementById('id01').style.display='block'"
             class="w3-button w3-white w3-padding-large w3-large w3-margin-top w3-opacity w3-hover-opacity-off">
             Share</a></p>
 
     <div id="id01" class="w3-modal" style="display: none;">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
-
             <div class="w3-center"><br>
                 <span onclick="document.getElementById('id01').style.display='none'"
                     class=" w3-button w3-xlarge w3-transparent w3-display-topright" title="Close Modal">×</span>
             </div>
-
             <form class="w3-container" method="POST" action="/share">
                 <div class="w3-section">
                     <label><b>Email</b></label>
@@ -115,36 +94,32 @@ See the LICENSE file in the project root for the full license information.
                         name="email" required>
                     <button class="w3-button w3-block w3-black w3-section w3-padding" type="submit">Share</button>
                 </div>
+            </form>
         </div>
     </div>
-
-    </header>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rR7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4xF86dIHNDz0W1"
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
     <script>
-        !function (a) { "use strict"; "function" == typeof define && define.amd ? define(["jquery"], a) : a(jQuery) }(function (a) { "use strict"; function b(a) { if (a instanceof Date) return a; if (String(a).match(g)) return String(a).match(/^[0-9]*$/) && (a = Number(a)), String(a).match(/\-/) && (a = String(a).replace(/\-/g, "/")), new Date(a); throw new Error("Couldn't cast `" + a + "` to a date object.") } function c(a) { var b = a.toString().replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"); return new RegExp(b) } function d(a) { return function (b) { var d = b.match(/%(-|!)?[A-Z]{1}(:[^;]+;)?/gi); if (d) for (var f = 0, g = d.length; f < g; ++f) { var h = d[f].match(/%(-|!)?([a-zA-Z]{1})(:[^;]+;)?/), j = c(h[0]), k = h[1] || "", l = h[3] || "", m = null; h = h[2], i.hasOwnProperty(h) && (m = i[h], m = Number(a[m])), null !== m && ("!" === k && (m = e(l, m)), "" === k && m < 10 && (m = "0" + m.toString()), b = b.replace(j, m.toString())) } return b = b.replace(/%%/, "%") } } function e(a, b) { var c = "s", d = ""; return a && (a = a.replace(/(:|;|\s)/gi, "").split(/\,/), 1 === a.length ? c = a[0] : (d = a[0], c = a[1])), Math.abs(b) > 1 ? c : d } var f = [], g = [], h = { precision: 100, elapse: !1, defer: !1 }; g.push(/^[0-9]*$/.source), g.push(/([0-9]{1,2}\/){2}[0-9]{4}( [0-9]{1,2}(:[0-9]{2}){2})?/.source), g.push(/[0-9]{4}([\/\-][0-9]{1,2}){2}( [0-9]{1,2}(:[0-9]{2}){2})?/.source), g = new RegExp(g.join("|")); var i = { Y: "years", m: "months", n: "daysToMonth", d: "daysToWeek", w: "weeks", W: "weeksToMonth", H: "hours", M: "minutes", S: "seconds", D: "totalDays", I: "totalHours", N: "totalMinutes", T: "totalSeconds" }, j = function (b, c, d) { this.el = b, this.$el = a(b), this.interval = null, this.offset = {}, this.options = a.extend({}, h), this.instanceNumber = f.length, f.push(this), this.$el.data("countdown-instance", this.instanceNumber), d && ("function" == typeof d ? (this.$el.on("update.countdown", d), this.$el.on("stoped.countdown", d), this.$el.on("finish.countdown", d)) : this.options = a.extend({}, h, d)), this.setFinalDate(c), this.options.defer === !1 && this.start() }; a.extend(j.prototype, { start: function () { null !== this.interval && clearInterval(this.interval); var a = this; this.update(), this.interval = setInterval(function () { a.update.call(a) }, this.options.precision) }, stop: function () { clearInterval(this.interval), this.interval = null, this.dispatchEvent("stoped") }, toggle: function () { this.interval ? this.stop() : this.start() }, pause: function () { this.stop() }, resume: function () { this.start() }, remove: function () { this.stop.call(this), f[this.instanceNumber] = null, delete this.$el.data().countdownInstance }, setFinalDate: function (a) { this.finalDate = b(a) }, update: function () { if (0 === this.$el.closest("html").length) return void this.remove(); var b, c = void 0 !== a._data(this.el, "events"), d = new Date; b = this.finalDate.getTime() - d.getTime(), b = Math.ceil(b / 1e3), b = !this.options.elapse && b < 0 ? 0 : Math.abs(b), this.totalSecsLeft !== b && c && (this.totalSecsLeft = b, this.elapsed = d >= this.finalDate, this.offset = { seconds: this.totalSecsLeft % 60, minutes: Math.floor(this.totalSecsLeft / 60) % 60, hours: Math.floor(this.totalSecsLeft / 60 / 60) % 24, days: Math.floor(this.totalSecsLeft / 60 / 60 / 24) % 7, daysToWeek: Math.floor(this.totalSecsLeft / 60 / 60 / 24) % 7, daysToMonth: Math.floor(this.totalSecsLeft / 60 / 60 / 24 % 30.4368), weeks: Math.floor(this.totalSecsLeft / 60 / 60 / 24 / 7), weeksToMonth: Math.floor(this.totalSecsLeft / 60 / 60 / 24 / 7) % 4, months: Math.floor(this.totalSecsLeft / 60 / 60 / 24 / 30.4368), years: Math.abs(this.finalDate.getFullYear() - d.getFullYear()), totalDays: Math.floor(this.totalSecsLeft / 60 / 60 / 24), totalHours: Math.floor(this.totalSecsLeft / 60 / 60), totalMinutes: Math.floor(this.totalSecsLeft / 60), totalSeconds: this.totalSecsLeft }, this.options.elapse || 0 !== this.totalSecsLeft ? this.dispatchEvent("update") : (this.stop(), this.dispatchEvent("finish"))) }, dispatchEvent: function (b) { var c = a.Event(b + ".countdown"); c.finalDate = this.finalDate, c.elapsed = this.elapsed, c.offset = a.extend({}, this.offset), c.strftime = d(this.offset), this.$el.trigger(c) } }), a.fn.countdown = function () { var b = Array.prototype.slice.call(arguments, 0); return this.each(function () { var c = a(this).data("countdown-instance"); if (void 0 !== c) { var d = f[c], e = b[0]; j.prototype.hasOwnProperty(e) ? d[e].apply(d, b.slice(1)) : null === String(e).match(/^[$A-Z_][0-9A-Z_$]*$/i) ? (d.setFinalDate.call(d, e), d.start()) : a.error("Method %s does not exist on jQuery.countdown".replace(/\%s/gi, e)) } else new j(this, b[0], b[1]) }) } });</script>
-    <script>
         window.onload = function () {
             if (window.localStorage) {
-            var isDark = localStorage.getItem("dark");
-            if (isDark == 'true') {
-                document.body.classList.add("dark-mode");
-                document.getElementById("toggle-button").firstElementChild.checked = true;
+                var isDark = localStorage.getItem("dark");
+                if (isDark == 'true') {
+                    document.body.classList.add("dark-mode");
+                    document.getElementById("toggle-button").firstElementChild.checked = true;
                 }
             }
         }
 
         window.onscroll = function (e) {
-
             e.preventDefault();
 
             let scroll = window.scrollY;
@@ -166,29 +141,20 @@ See the LICENSE file in the project root for the full license information.
                 logo.classList.remove("logo");
             }
         };
-        
-    </script>
-    <script>
+
         var darkModeButton = document.getElementById("toggle-button");
         darkModeButton.addEventListener("click", function () {
-            if(darkModeButton.firstElementChild.checked) {
+            if (darkModeButton.firstElementChild.checked) {
                 localStorage.setItem("dark", true);
                 document.body.classList.add("dark-mode");
             } else {
                 document.body.classList.remove("dark-mode");
                 localStorage.setItem("dark", false);
             }
-        })
-        function deleteItem(deleteIcon) {
-            let index = deleteIcon.dataset["index"]
-            rm_form = document.forms["rm-wishlist-item"]
-            rm_form["index"].value = index - 1 // -1 as index in list starts at 0
-            rm_form.submit()
-            // Find the parent <li> element and remove it
-            //var tableRow = deleteIcon.closest('tr');
-            //tableRow.parentElement.removeChild(tableRow);
-        }
+        });
+
     </script>
+
 </body>
 
 </html>
