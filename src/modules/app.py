@@ -253,15 +253,49 @@ def wishlist():
     return render_template('wishlist.html', products=products)
 
 
-@app.route('/add_to_wishlist', methods=['POST'])
+@app.route('/add-wishlist-item', methods=['POST'])
 def add_to_wishlist():
-    user_id = session['user_id']  # Assuming user_id is stored directly in session
-    product_id = request.form['product_id']  # Get product_id from form data
+    print("Session Data:", session)
 
-    # Add to wishlist
-    db.add_to_wishlist(user_id, product_id)
+    if 'username' not in session:
+        return jsonify({'error': 'Unauthorized access!'}), 401
 
-    return jsonify({"message": "Product added to wishlist!"}), 200
+    user = db.get_user(session["user_info"][0])
+
+
+    if not user:
+        return jsonify({'error': 'User not found!'}), 404
+
+    user_id = user[0]  # Assuming user[0] is the user_id
+
+    title = request.form.get('title')
+    img = request.form.get('img')
+    price = request.form.get('price')
+    website = request.form.get('website')
+    rating = request.form.get('rating')
+
+    if not all([title, img, price, website, rating]):
+        return jsonify({'error': 'Missing data!'}), 400
+
+    try:
+        product = db.get_product(url=website)
+        if not product:
+            db.insert_product(
+                name=title, description="No description available", price=price,
+                currency="USD", rating=rating, num_reviews=0, url=website,
+                image_url=img, category="Unknown", source=website
+            )
+            product = db.get_product(url=website)
+
+        product_id = product[0]
+
+        if db.is_product_in_wishlist(user_id, product_id):
+            return jsonify({"error": "Product is already in wishlist!"}), 409
+
+        db.add_to_wishlist(user_id, product_id)
+        return jsonify({"message": "Product added to wishlist!"}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
 
 @app.route('/remove-wishlist-item', methods=['POST'])
 def remove_wishlist_item():
