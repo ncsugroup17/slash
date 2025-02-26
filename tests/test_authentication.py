@@ -133,7 +133,7 @@ class TestAmazonScraper(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Set parameters for the test
-        cls.query = "test product"
+        cls.query = "Bag"
         cls.df_flag = False  # Adjust based on your data requirements
         cls.currency = "USD"  # Set desired currency
 
