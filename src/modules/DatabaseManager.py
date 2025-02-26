@@ -221,12 +221,6 @@ class DatabaseManager:
         """, (product_id,))
         return self.cursor.fetchall()
 
-    def get_user(self, username):
-        self.cursor.execute('''
-            SELECT id FROM users WHERE email = ?
-        ''', (username,))
-        return self.cursor.fetchone()
-
     def close(self):
         """Closes the database connection."""
         self.conn.close()
