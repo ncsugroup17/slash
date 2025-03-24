@@ -102,7 +102,10 @@ def callback():
     credentials = flow.credentials
     request_session = requests.Request()
     id_info = id_token.verify_oauth2_token(
-        credentials.id_token, request_session, flow.client_config['client_id']
+        credentials.id_token,
+        request_session,
+        flow.client_config['client_id'],
+        clock_skew_in_seconds=60  # Allows a 60-second tolerance
     )
 
     
