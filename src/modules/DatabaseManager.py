@@ -181,7 +181,7 @@ class DatabaseManager:
 
     def remove_from_wishlist(self, user_id, product_id):
         self.cursor.execute('''
-            DELETE FROM wishlists WHERE user_id = ? AND id = ?
+            DELETE FROM wishlists WHERE user_id = ? AND product_id = ?
         ''', (user_id, product_id))
         self.conn.commit()
 

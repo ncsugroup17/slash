@@ -80,3 +80,41 @@ Updated to use a Database, testing of the Database, Wishlist, and faster Web Scr
     <td align="center"><a href="https://github.com/DillonMichels"><img src="https://avatars.githubusercontent.com/u/88557889?v=4" width="75px;" alt=""/><br /><sub><b>Dillon Michels</b></sub></a></td>
   </tr>
 </table>
+
+## Running the Application
+
+### Backend (Flask)
+
+You can run the Flask backend with proper URL configuration using the `run.py` script:
+
+```bash
+# Basic run at port 5000
+python run.py
+
+# Specify frontend URL (e.g., for Next.js frontend)
+python run.py --frontend-url http://localhost:3000
+
+# Specify custom Google redirect URI
+python run.py --redirect-uri http://localhost:5000/callback 
+
+# Full configuration example
+python run.py --host localhost --port 5000 --frontend-url http://localhost:3000 --debug
+```
+
+The application now dynamically determines URLs based on:
+1. Environment variables if provided
+2. Request information (headers, referrers)
+3. Smart fallbacks with sensible defaults
+
+This approach avoids hardcoded URLs and makes the application work seamlessly with both the original and new frontends.
+
+### Frontend (Next.js)
+
+Run the Next.js frontend:
+
+```bash
+cd new-frontend
+npm run dev
+```
+
+The Next.js application will be available at http://localhost:3000.

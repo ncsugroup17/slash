@@ -135,3 +135,49 @@ dmypy.json
 *.csv
 user_data.json
 database.db
+
+# Next.js specific
+.next/
+out/
+
+# Frontend dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# Frontend build outputs
+new-frontend/.next/
+new-frontend/out/
+new-frontend/build/
+new-frontend/node_modules/
+
+# Local Netlify folder
+.netlify
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# MacOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

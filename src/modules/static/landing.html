@@ -39,9 +39,9 @@ See the LICENSE file in the project root for the full license information.
       
               {% if login %}
               <p>Welcome, {{ session['user_info'][1] }}!</p>
-              <a href="{{ url_for('logout') }}">Logout</a>
+              <a href="{{ url_for('logout') }}?redirect_uri={{ request.host_url }}">Logout</a>
           {% else %}
-              <a href="{{ url_for('login_google') }}">
+              <a href="{{ url_for('login_google') }}?redirect_uri={{ request.host_url }}">
                   <button type="button" >Login with Google</button>
               </a>
               <!-- <a href="{{ url_for('login') }}">
