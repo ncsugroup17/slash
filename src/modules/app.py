@@ -189,8 +189,25 @@ def register():
 
 @app.route('/share', methods=['POST'])
 def share():
-    share_wishlist(session['username'], "default", request.form['email'])
-    return redirect(url_for('wishlist'))
+    try:
+        # Validate session and email input
+        if 'username' not in session:
+            return jsonify({'error': 'User not logged in'}), 401
+        
+        # Get JSON data instead of form data
+        data = request.json
+        email = data.get('email')
+        wishlist = data.get('wishlist')
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+
+        # Call the share_wishlist function (update if your function also needs the wishlist)
+        share_wishlist(session['username'], "default", email, wishlist)
+        return jsonify({'message': 'Wishlist shared successfully'}), 200
+    except Exception as e:
+        app.logger.error(f"Error sharing wishlist: {str(e)}", exc_info=True)
+        return jsonify({'error': f'Failed to share wishlist: {str(e)}'}), 500
 
 
 @app.route('/logout')

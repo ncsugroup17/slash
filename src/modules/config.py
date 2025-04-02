@@ -11,7 +11,7 @@ import os
 class Config(object):
     DEBUG = False
     TESTING = False
-    EMAIL_PASS = 'amkx fedi ilnm qahn'
+    EMAIL_PASS = 'siyq mvum iyle clqk'
     CLIENT_ID = 'REPLACE_WITH_CLIENT_ID'
     CLIENT_SECRET = 'REPLACE_WITH_CLIENT_SECRET'
     SECRET_KEY = os.getenv('SECRET_KEY', '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')
