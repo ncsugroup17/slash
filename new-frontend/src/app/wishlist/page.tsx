@@ -271,7 +271,7 @@ export default function WishlistPage() {
   };
   
   // Function to share wishlist
-  const handleShareWishlist = async (e) => {
+  const handleShareWishlist = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShareStatus({ message: 'Sharing...', isError: false });
     
@@ -282,15 +282,21 @@ export default function WishlistPage() {
       
       console.log(`Sharing wishlist with ${sharingEmail}`);
       
-      // Submit via fetch
+      // Send email via backend API
       const response = await fetch(`${BACKEND_URL}/share`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: sharingEmail,
+          wishlist: wishlistItems,
+        }),
         credentials: 'include',
-        redirect: 'manual' // Don't follow redirects
       });
       
       console.log('Share response:', response.status);
+      
       
       // Show success message
       setShareStatus({ message: 'Wishlist shared successfully!', isError: false });
