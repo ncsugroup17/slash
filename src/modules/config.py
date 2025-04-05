@@ -27,6 +27,22 @@ class Config(object):
     # Use environment variables for the callback URL or fall back to the default Flask callback
     GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', '')
     FRONTEND_URL = os.getenv('FRONTEND_URL', '')
+    
+    # Groq API Configuration
+    GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+    GROQ_API_URL = os.getenv('GROQ_API_URL', 'https://api.groq.com/openai/v1/chat/completions')
+    GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama3-70b-8192')
+    
+    # AI Recommendation System Config
+    AI_RECOMMENDATION_ENABLED = os.getenv('AI_RECOMMENDATION_ENABLED', 'True').lower() in ('true', 'yes', '1')
+    AI_MAX_QUESTIONS = int(os.getenv('AI_MAX_QUESTIONS', '5'))
+    AI_DEFAULT_TEMPERATURE = float(os.getenv('AI_DEFAULT_TEMPERATURE', '0.7'))
+    
+    @classmethod
+    def is_ai_enabled(cls):
+        """Check if AI recommendations are enabled"""
+        return cls.AI_RECOMMENDATION_ENABLED and cls.GROQ_API_KEY
+
 
     @classmethod
     def get_google_redirect_uri(cls, request=None):
