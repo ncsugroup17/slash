@@ -305,7 +305,16 @@ def search():
     total_pages = 0
     if isinstance(data, pd.DataFrame) and not data.empty:
         total_pages = (len(data) + 19) // 20
-    
+
+        # Log the search to the database 
+        try:
+            email = session.get("username")
+            filters_applied = ""
+            num_results = len(data)
+            user_id = db.get_user_id_by_email(email)
+            db.log_search(user_id, product, filters_applied, num_results)
+        except Exception as log_error:
+            print(f"Logging search failed: {log_error}")
     # If the request wants JSON (API request), return JSON
     if want_json:
         if isinstance(data, pd.DataFrame):
@@ -762,8 +771,6 @@ def ai_recommendations():
                     for rec in recommendations
                 ]
 
-
-                print(f"Structured Recommendations {structured_recommendation}")
                 # Fallback URL in case scraper missed it
                 for product in recommendations:
                     if not product.get('url'):
@@ -795,5 +802,89 @@ def ai_recommendations():
         app.logger.error(f"Unexpected error: {str(e)}")
         return jsonify({'error': 'Unexpected error occurred'}), 500
 
+# Personalized Recommendation 
+@app.route('/personalized-recommendations', methods=['GET'])
+def personalized_recommendations():
+    if 'username' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+
+    email = session.get('username')
+    user_id = db.get_user_id_by_email(email)
+
+    if not user_id:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Step 1: Get full search history
+    search_rows = db.get_search_history(user_id)
+    if not search_rows:
+        return jsonify({
+            'response': "Please search for something first using the search",
+            'recommendations': []
+        }), 200
+
+    # Step 2: Extract and clean search queries
+    raw_queries = [row[2] for row in search_rows if row[2]]  # index 2: search_query
+    unique_queries = list(set(raw_queries))
+    
+    system_prompt = """
+    You are a smart assistant. Your task is to convert product search queries into single, compressed, lowercase keywords for scraping. 
+    For example:
+    - "red dress for wedding" → "reddresswedding"
+    - "wireless noise cancelling headphones" → "wirelessheadphones"
+
+    Return a JSON list of compact query versions:
+    { "converted": ["reddresswedding", "wirelessheadphones", ...] }
+    """
+    
+    groq_response = rq.post(
+        GROQ_API_URL,
+        headers=get_groq_headers(),
+        json={
+            "model": GROQ_MODEL,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": "\n".join(unique_queries)}
+            ],
+            "temperature": 0.5,
+            "max_tokens": 256,
+            "response_format": {"type": "json_object"}
+        }
+    )
+
+    if groq_response.status_code != 200:
+        print("Groq error:", groq_response.text)
+        return jsonify({'response': 'Failed to process your history for recommendations.'}), 200
+
+    try:
+        compact_queries = groq_response.json()["choices"][0]["message"]["content"]
+        parsed = json.loads(compact_queries)
+        search_keywords = parsed.get("converted", [])[:5]  # Top 5 queries
+    except Exception as e:
+        print("Groq parsing error:", e)
+        return jsonify({'response': 'Could not parse AI-generated search suggestions.'}), 200
+
+    print("Using search queries:", search_keywords)
+    
+    all_recommendations = []
+    for keyword in search_keywords:
+        try:
+            products = searchWalmart(keyword, df_flag=0, currency=None)
+            for product in products[:2]:  # Limit to 2 per query = 5×2 = 10 total
+                all_recommendations.append({
+                    "title": product.get("title", "No title"),
+                    "price": product.get("price", "N/A"),
+                    "rating": product.get("rating") or f"{round(random.uniform(1.0, 5.0), 1)}",
+                    "img": product.get("img_link", ""),
+                    "link": product.get("url", "")
+                })
+        except Exception as scrape_error:
+            print(f"Scraping failed for {keyword}: {scrape_error}")
+            continue
+
+    return jsonify({
+        'response': "Here are some personalized picks based on your past searches:",
+        'recommendations': all_recommendations
+    }), 200
+    
 if __name__ == '__main__':
     app.run(debug=True)
