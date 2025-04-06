@@ -46,12 +46,12 @@ export function Navbar({ username }: NavbarProps) {
               </Link>
               <Link href="/recommendations" className="text-sm font-medium transition-colors hover:text-primary">
                 <span className="flex items-center">
-                  <span className="mr-1">✨</span> AI Recommendations
+                  <span className="mr-1"></span> Smart Finds
                 </span>
               </Link>
               <Link href="/personalized-recommendations" className="text-sm font-medium transition-colors hover:text-primary">
                 <span className="flex items-center">
-                  <span className="mr-1"></span> For You
+                  <span className="mr-1"></span> For You Page
                 </span>
               </Link>
             </>

@@ -751,12 +751,23 @@ def ai_recommendations():
             search_query = parsed_content.get('searchQuery', '').replace(" ", "").lower()
             print(f"🔍 Final Amazon search query: {search_query}")
 
+            # Adding to the database for search log
+            # Log the search to the database 
+            try:
+                email = session.get("username")
+                filters_applied = ""
+                num_results = 0
+                user_id = db.get_user_id_by_email(email)
+                db.log_search(user_id, search_query, filters_applied, num_results)
+            except Exception as log_error:
+                print(f"Logging search failed: {log_error}")
+            
             try:
                 
                 results = searchWalmart(search_query, df_flag=0, currency=None)
 
                 if isinstance(results, pd.DataFrame):
-                    results = results.to_dict(orient='records')  # ✅ convert to list of dicts
+                    results = results.to_dict(orient='records') 
 
                 recommendations = results[:6] if isinstance(results, list) else []
 
@@ -818,14 +829,14 @@ def personalized_recommendations():
     search_rows = db.get_search_history(user_id)
     if not search_rows:
         return jsonify({
-            'response': "Please search for something first using the search",
+            'response': "Please search for something first using the AI Recommendation search",
             'recommendations': []
         }), 200
 
     # Step 2: Extract and clean search queries
     raw_queries = [row[2] for row in search_rows if row[2]]  # index 2: search_query
     unique_queries = list(set(raw_queries))
-    
+    print(f"Unique Queries {unique_queries}")
     system_prompt = """
     You are a smart assistant. Your task is to convert product search queries into single, compressed, lowercase keywords for scraping. 
     For example:
@@ -858,7 +869,7 @@ def personalized_recommendations():
     try:
         compact_queries = groq_response.json()["choices"][0]["message"]["content"]
         parsed = json.loads(compact_queries)
-        search_keywords = parsed.get("converted", [])[:5]  # Top 5 queries
+        search_keywords = parsed.get("converted", [])[:5] 
     except Exception as e:
         print("Groq parsing error:", e)
         return jsonify({'response': 'Could not parse AI-generated search suggestions.'}), 200
@@ -869,18 +880,22 @@ def personalized_recommendations():
     for keyword in search_keywords:
         try:
             products = searchWalmart(keyword, df_flag=0, currency=None)
-            for product in products[:2]:  # Limit to 2 per query = 5×2 = 10 total
+            mid = len(products) // 2
+            middle_two = products[mid - 1 : mid + 1]
+
+            for product in middle_two:  # Limit to 2 per query = 5×2 = 10 total
                 all_recommendations.append({
                     "title": product.get("title", "No title"),
                     "price": product.get("price", "N/A"),
                     "rating": product.get("rating") or f"{round(random.uniform(1.0, 5.0), 1)}",
                     "img": product.get("img_link", ""),
-                    "link": product.get("url", "")
+                    "link": product.get("link", "")
                 })
         except Exception as scrape_error:
             print(f"Scraping failed for {keyword}: {scrape_error}")
             continue
-
+    
+    print(f"All Recommendation {all_recommendations}")
     return jsonify({
         'response': "Here are some personalized picks based on your past searches:",
         'recommendations': all_recommendations
