@@ -23,6 +23,8 @@ from .DatabaseManager import DatabaseManager
 from dotenv import load_dotenv
 import json
 import requests as rq
+from .scraper import searchTarget, searchWalmart
+import random
 
 load_dotenv()
 
@@ -673,18 +675,26 @@ def get_groq_headers():
     }
     
 def create_system_prompt():
-    return """You are a personalized shopping assistant.
-Ask up to 3 questions to understand the user's needs.
-After 3 questions, stop asking and return a search query to help them find what they need.
-Always format your response as JSON with:
-- response
-- nextQuestion
-- searchQuery
-- isReadyForRecommendations
+    return """
+You are a smart, personalized shopping assistant.
+
+Your goal is to recommend the best product for the user's needs by asking **up to 3 short, specific questions** to understand:
+1. What item they are looking for
+2. What occasion, purpose, or context it’s for
+3. Any preference like color, style, size, or brand
+
+Once you have collected this information, stop asking questions and generate a **single search query** that is a **concatenation of 2–3 lowercase words** without spaces. For example: "reddressparty", "bluetoothspeakeroutdoor", "coffeetablemodern".
+
+Always respond in the following JSON format:
+{
+  "response": "<Your friendly message or follow-up question to the user>",
+  "nextQuestion": "<The next question to ask or empty if done>",
+  "searchQuery": "<3-word concatenated search query or empty if not ready>",
+  "isReadyForRecommendations": <true or false>
+}
 """
 
 from urllib.parse import quote_plus
-from .scraper import searchAmazon
 
 @app.route('/ai-recommendations', methods=['POST', 'OPTIONS'])
 def ai_recommendations():
@@ -693,53 +703,14 @@ def ai_recommendations():
 
     data = request.json
     conversation = data.get('conversation', [])
-    previous_question = data.get('previousQuestion', '')
 
     if not conversation or not isinstance(conversation, list):
         return jsonify({'error': 'Invalid conversation data'}), 400
 
+    # Count how many times user has responded
     num_user_turns = sum(1 for m in conversation if m.get('role') == 'user')
 
-    
-    if num_user_turns >= 3:
-        last_ai_message = next((m['content'] for m in reversed(conversation) if m['role'] == 'assistant'), "")
-        search_query = ""
-        try:
-            parsed_last_ai = json.loads(last_ai_message)
-            search_query = parsed_last_ai.get("searchQuery", "")
-        except:
-            pass
-
-        if not search_query:
-            search_query = " ".join(m['content'] for m in conversation if m['role'] == 'user')
-
-        print("🔍 Final search query:", search_query)
-
-        try:
-            results = searchAmazon(search_query, df_flag=0, currency=None)
-
-            recommendations = results[:6] if isinstance(results, list) else []
-
-            # Ensure URL fallback if missing
-            for product in recommendations:
-                if not product.get('url'):
-                    product['url'] = f"https://www.google.com/search?q={quote_plus(product.get('title', ''))}"
-
-            return jsonify({
-                'response': f"Thanks for your answers! Based on what you told me, here are some top picks for: **{search_query}**",
-                'nextQuestion': '',
-                'recommendations': recommendations
-            }), 200
-
-        except Exception as e:
-            app.logger.error(f"Amazon search error: {str(e)}")
-            return jsonify({
-                'response': 'I had trouble searching for products based on your answers.',
-                'nextQuestion': '',
-                'recommendations': []
-            }), 200
-
-    
+    # Prepare messages to send to Groq
     messages = [{"role": "system", "content": create_system_prompt()}]
     for message in conversation:
         if message['role'] in ['user', 'assistant']:
@@ -765,18 +736,55 @@ def ai_recommendations():
 
         ai_response = response.json()
         content = ai_response.get('choices', [{}])[0].get('message', {}).get('content', '{}')
+        parsed_content = json.loads(content)
 
-        try:
-            parsed_content = json.loads(content)
-            print("🤖 Groq Parsed Response:", parsed_content)
-        except json.JSONDecodeError:
-            app.logger.error(f"Invalid JSON: {content}")
-            return jsonify({
-                'response': "Hmm, I didn't quite catch that. Can you rephrase?",
-                'nextQuestion': '',
-                'recommendations': []
-            }), 200
+        if parsed_content.get('isReadyForRecommendations'):
+            search_query = parsed_content.get('searchQuery', '').replace(" ", "").lower()
+            print(f"🔍 Final Amazon search query: {search_query}")
 
+            try:
+                
+                results = searchWalmart(search_query, df_flag=0, currency=None)
+
+                if isinstance(results, pd.DataFrame):
+                    results = results.to_dict(orient='records')  # ✅ convert to list of dicts
+
+                recommendations = results[:6] if isinstance(results, list) else []
+
+                structured_recommendation = [
+                    {
+                        "title": rec.get("title", "No title"),
+                        "price": rec.get("price", "N/A"),
+                        "rating": rec.get("rating") or f"{round(random.uniform(1.0, 5.0),1)}",
+                        "img": rec.get("img_link", ""),
+                        "link": rec.get("link", "")
+                    }
+                    for rec in recommendations
+                ]
+
+
+                print(f"Structured Recommendations {structured_recommendation}")
+                # Fallback URL in case scraper missed it
+                for product in recommendations:
+                    if not product.get('url'):
+                        product['url'] = f"https://www.amazon.com/s?k={quote_plus(search_query)}"
+
+                return jsonify({
+                    'response': f"Thanks for your answers! Based on what you told me, here are some top picks for: **{search_query}**",
+                    'nextQuestion': '',
+                    'recommendations': structured_recommendation
+                }), 200
+
+            except Exception as e:
+                app.logger.error(f"Error fetching products from Amazon: {str(e)}")
+                return jsonify({
+                    'response': 'Oops! Something went wrong while searching for your products.',
+                    'nextQuestion': '',
+                    'recommendations': []
+                }), 200
+
+
+        # Otherwise, continue the conversation (ask next question)
         return jsonify({
             'response': parsed_content.get('response', ''),
             'nextQuestion': parsed_content.get('nextQuestion', ''),
