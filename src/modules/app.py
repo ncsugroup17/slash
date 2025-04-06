@@ -20,6 +20,15 @@ from .features import (
 )
 from .config import Config
 from .DatabaseManager import DatabaseManager
+from dotenv import load_dotenv
+import json
+import requests as rq
+
+load_dotenv()
+
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "llama3-70b-8192" 
 
 # Initialize Flask app
 app = Flask(__name__, template_folder=".")
@@ -655,6 +664,128 @@ def check_auth():
     else:
         # Not authenticated
         return jsonify({'authenticated': False}), 401
+
+def get_groq_headers():
+    """Get headers for Groq API requests."""
+    return {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+def create_system_prompt():
+    return """You are a personalized shopping assistant.
+Ask up to 3 questions to understand the user's needs.
+After 3 questions, stop asking and return a search query to help them find what they need.
+Always format your response as JSON with:
+- response
+- nextQuestion
+- searchQuery
+- isReadyForRecommendations
+"""
+
+from urllib.parse import quote_plus
+from .scraper import searchAmazon
+
+@app.route('/ai-recommendations', methods=['POST', 'OPTIONS'])
+def ai_recommendations():
+    if request.method == 'OPTIONS':
+        return make_response('', 200)
+
+    data = request.json
+    conversation = data.get('conversation', [])
+    previous_question = data.get('previousQuestion', '')
+
+    if not conversation or not isinstance(conversation, list):
+        return jsonify({'error': 'Invalid conversation data'}), 400
+
+    num_user_turns = sum(1 for m in conversation if m.get('role') == 'user')
+
+    
+    if num_user_turns >= 3:
+        last_ai_message = next((m['content'] for m in reversed(conversation) if m['role'] == 'assistant'), "")
+        search_query = ""
+        try:
+            parsed_last_ai = json.loads(last_ai_message)
+            search_query = parsed_last_ai.get("searchQuery", "")
+        except:
+            pass
+
+        if not search_query:
+            search_query = " ".join(m['content'] for m in conversation if m['role'] == 'user')
+
+        print("🔍 Final search query:", search_query)
+
+        try:
+            results = searchAmazon(search_query, df_flag=0, currency=None)
+
+            recommendations = results[:6] if isinstance(results, list) else []
+
+            # Ensure URL fallback if missing
+            for product in recommendations:
+                if not product.get('url'):
+                    product['url'] = f"https://www.google.com/search?q={quote_plus(product.get('title', ''))}"
+
+            return jsonify({
+                'response': f"Thanks for your answers! Based on what you told me, here are some top picks for: **{search_query}**",
+                'nextQuestion': '',
+                'recommendations': recommendations
+            }), 200
+
+        except Exception as e:
+            app.logger.error(f"Amazon search error: {str(e)}")
+            return jsonify({
+                'response': 'I had trouble searching for products based on your answers.',
+                'nextQuestion': '',
+                'recommendations': []
+            }), 200
+
+    
+    messages = [{"role": "system", "content": create_system_prompt()}]
+    for message in conversation:
+        if message['role'] in ['user', 'assistant']:
+            messages.append({"role": message['role'], "content": message['content']})
+
+    try:
+        response = rq.post(
+            GROQ_API_URL,
+            headers=get_groq_headers(),
+            json={
+                "model": GROQ_MODEL,
+                "messages": messages,
+                "temperature": 0.7,
+                "max_tokens": 1024,
+                "response_format": {"type": "json_object"}
+            },
+            timeout=30
+        )
+
+        if response.status_code != 200:
+            app.logger.error(f"Groq API error: {response.status_code} - {response.text}")
+            return jsonify({'error': 'AI service error'}), 500
+
+        ai_response = response.json()
+        content = ai_response.get('choices', [{}])[0].get('message', {}).get('content', '{}')
+
+        try:
+            parsed_content = json.loads(content)
+            print("🤖 Groq Parsed Response:", parsed_content)
+        except json.JSONDecodeError:
+            app.logger.error(f"Invalid JSON: {content}")
+            return jsonify({
+                'response': "Hmm, I didn't quite catch that. Can you rephrase?",
+                'nextQuestion': '',
+                'recommendations': []
+            }), 200
+
+        return jsonify({
+            'response': parsed_content.get('response', ''),
+            'nextQuestion': parsed_content.get('nextQuestion', ''),
+            'recommendations': []
+        }), 200
+
+    except Exception as e:
+        app.logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({'error': 'Unexpected error occurred'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
