@@ -221,6 +221,12 @@ class DatabaseManager:
         """, (product_id,))
         return self.cursor.fetchall()
 
+    def get_user_id_by_email(self, email):
+        self.cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    
     def close(self):
         """Closes the database connection."""
         self.conn.close()

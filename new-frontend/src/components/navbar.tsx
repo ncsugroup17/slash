@@ -44,6 +44,16 @@ export function Navbar({ username }: NavbarProps) {
               <Link href="/wishlist" className="text-sm font-medium transition-colors hover:text-primary">
                 Wishlist
               </Link>
+              <Link href="/recommendations" className="text-sm font-medium transition-colors hover:text-primary">
+                <span className="flex items-center">
+                  <span className="mr-1"></span> Smart Finds
+                </span>
+              </Link>
+              <Link href="/personalized-recommendations" className="text-sm font-medium transition-colors hover:text-primary">
+                <span className="flex items-center">
+                  <span className="mr-1"></span> For You Page
+                </span>
+              </Link>
             </>
           )}
         </div>

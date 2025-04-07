@@ -20,6 +20,17 @@ from .features import (
 )
 from .config import Config
 from .DatabaseManager import DatabaseManager
+from dotenv import load_dotenv
+import json
+import requests as rq
+from .scraper import searchTarget, searchWalmart
+import random
+
+load_dotenv()
+
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "llama3-70b-8192" 
 
 # Initialize Flask app
 app = Flask(__name__, template_folder=".")
@@ -294,7 +305,16 @@ def search():
     total_pages = 0
     if isinstance(data, pd.DataFrame) and not data.empty:
         total_pages = (len(data) + 19) // 20
-    
+
+        # Log the search to the database 
+        try:
+            email = session.get("username")
+            filters_applied = ""
+            num_results = len(data)
+            user_id = db.get_user_id_by_email(email)
+            db.log_search(user_id, product, filters_applied, num_results)
+        except Exception as log_error:
+            print(f"Logging search failed: {log_error}")
     # If the request wants JSON (API request), return JSON
     if want_json:
         if isinstance(data, pd.DataFrame):
@@ -656,5 +676,230 @@ def check_auth():
         # Not authenticated
         return jsonify({'authenticated': False}), 401
 
+def get_groq_headers():
+    """Get headers for Groq API requests."""
+    return {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+def create_system_prompt():
+    return """
+You are a smart, personalized shopping assistant.
+
+Your goal is to recommend the best product for the user's needs by asking **up to 3 short, specific questions** to understand:
+1. What item they are looking for
+2. What occasion, purpose, or context it’s for
+3. Any preference like color, style, size, or brand
+
+Once you have collected this information, stop asking questions and generate a **single search query** that is a **concatenation of 2–3 lowercase words** without spaces. For example: "reddressparty", "bluetoothspeakeroutdoor", "coffeetablemodern".
+
+Always respond in the following JSON format:
+{
+  "response": "<Your friendly message or follow-up question to the user>",
+  "nextQuestion": "<The next question to ask or empty if done>",
+  "searchQuery": "<3-word concatenated search query or empty if not ready>",
+  "isReadyForRecommendations": <true or false>
+}
+"""
+
+from urllib.parse import quote_plus
+
+@app.route('/ai-recommendations', methods=['POST', 'OPTIONS'])
+def ai_recommendations():
+    if request.method == 'OPTIONS':
+        return make_response('', 200)
+
+    data = request.json
+    conversation = data.get('conversation', [])
+
+    if not conversation or not isinstance(conversation, list):
+        return jsonify({'error': 'Invalid conversation data'}), 400
+
+    # Count how many times user has responded
+    num_user_turns = sum(1 for m in conversation if m.get('role') == 'user')
+
+    # Prepare messages to send to Groq
+    messages = [{"role": "system", "content": create_system_prompt()}]
+    for message in conversation:
+        if message['role'] in ['user', 'assistant']:
+            messages.append({"role": message['role'], "content": message['content']})
+
+    try:
+        response = rq.post(
+            GROQ_API_URL,
+            headers=get_groq_headers(),
+            json={
+                "model": GROQ_MODEL,
+                "messages": messages,
+                "temperature": 0.7,
+                "max_tokens": 1024,
+                "response_format": {"type": "json_object"}
+            },
+            timeout=30
+        )
+
+        if response.status_code != 200:
+            app.logger.error(f"Groq API error: {response.status_code} - {response.text}")
+            return jsonify({'error': 'AI service error'}), 500
+
+        ai_response = response.json()
+        content = ai_response.get('choices', [{}])[0].get('message', {}).get('content', '{}')
+        parsed_content = json.loads(content)
+
+        if parsed_content.get('isReadyForRecommendations'):
+            search_query = parsed_content.get('searchQuery', '').replace(" ", "").lower()
+            print(f"🔍 Final Amazon search query: {search_query}")
+
+            # Adding to the database for search log
+            # Log the search to the database 
+            try:
+                email = session.get("username")
+                filters_applied = ""
+                num_results = 0
+                user_id = db.get_user_id_by_email(email)
+                db.log_search(user_id, search_query, filters_applied, num_results)
+            except Exception as log_error:
+                print(f"Logging search failed: {log_error}")
+            
+            try:
+                
+                results = searchWalmart(search_query, df_flag=0, currency=None)
+
+                if isinstance(results, pd.DataFrame):
+                    results = results.to_dict(orient='records') 
+
+                recommendations = results[:6] if isinstance(results, list) else []
+
+                structured_recommendation = [
+                    {
+                        "title": rec.get("title", "No title"),
+                        "price": rec.get("price", "N/A"),
+                        "rating": rec.get("rating") or f"{round(random.uniform(1.0, 5.0),1)}",
+                        "img": rec.get("img_link", ""),
+                        "link": rec.get("link", "")
+                    }
+                    for rec in recommendations
+                ]
+
+                # Fallback URL in case scraper missed it
+                for product in recommendations:
+                    if not product.get('url'):
+                        product['url'] = f"https://www.amazon.com/s?k={quote_plus(search_query)}"
+
+                return jsonify({
+                    'response': f"Thanks for your answers! Based on what you told me, here are some top picks for: **{search_query}**",
+                    'nextQuestion': '',
+                    'recommendations': structured_recommendation
+                }), 200
+
+            except Exception as e:
+                app.logger.error(f"Error fetching products from Amazon: {str(e)}")
+                return jsonify({
+                    'response': 'Oops! Something went wrong while searching for your products.',
+                    'nextQuestion': '',
+                    'recommendations': []
+                }), 200
+
+
+        # Otherwise, continue the conversation (ask next question)
+        return jsonify({
+            'response': parsed_content.get('response', ''),
+            'nextQuestion': parsed_content.get('nextQuestion', ''),
+            'recommendations': []
+        }), 200
+
+    except Exception as e:
+        app.logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({'error': 'Unexpected error occurred'}), 500
+
+# Personalized Recommendation 
+@app.route('/personalized-recommendations', methods=['GET'])
+def personalized_recommendations():
+    if 'username' not in session:
+        return jsonify({'error': 'Authentication required'}), 401
+
+    email = session.get('username')
+    user_id = db.get_user_id_by_email(email)
+
+    if not user_id:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Step 1: Get full search history
+    search_rows = db.get_search_history(user_id)
+    if not search_rows:
+        return jsonify({
+            'response': "Please search for something first using the AI Recommendation search",
+            'recommendations': []
+        }), 200
+
+    # Step 2: Extract and clean search queries
+    raw_queries = [row[2] for row in search_rows if row[2]]  # index 2: search_query
+    unique_queries = list(set(raw_queries))
+    print(f"Unique Queries {unique_queries}")
+    system_prompt = """
+    You are a smart assistant. Your task is to convert product search queries into single, compressed, lowercase keywords for scraping. 
+    For example:
+    - "red dress for wedding" → "reddresswedding"
+    - "wireless noise cancelling headphones" → "wirelessheadphones"
+
+    Return a JSON list of compact query versions:
+    { "converted": ["reddresswedding", "wirelessheadphones", ...] }
+    """
+    
+    groq_response = rq.post(
+        GROQ_API_URL,
+        headers=get_groq_headers(),
+        json={
+            "model": GROQ_MODEL,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": "\n".join(unique_queries)}
+            ],
+            "temperature": 0.5,
+            "max_tokens": 256,
+            "response_format": {"type": "json_object"}
+        }
+    )
+
+    if groq_response.status_code != 200:
+        print("Groq error:", groq_response.text)
+        return jsonify({'response': 'Failed to process your history for recommendations.'}), 200
+
+    try:
+        compact_queries = groq_response.json()["choices"][0]["message"]["content"]
+        parsed = json.loads(compact_queries)
+        search_keywords = parsed.get("converted", [])[:5] 
+    except Exception as e:
+        print("Groq parsing error:", e)
+        return jsonify({'response': 'Could not parse AI-generated search suggestions.'}), 200
+
+    print("Using search queries:", search_keywords)
+    
+    all_recommendations = []
+    for keyword in search_keywords:
+        try:
+            products = searchWalmart(keyword, df_flag=0, currency=None)
+            mid = len(products) // 2
+            middle_two = products[mid - 1 : mid + 1]
+
+            for product in middle_two:  # Limit to 2 per query = 5×2 = 10 total
+                all_recommendations.append({
+                    "title": product.get("title", "No title"),
+                    "price": product.get("price", "N/A"),
+                    "rating": product.get("rating") or f"{round(random.uniform(1.0, 5.0), 1)}",
+                    "img": product.get("img_link", ""),
+                    "link": product.get("link", "")
+                })
+        except Exception as scrape_error:
+            print(f"Scraping failed for {keyword}: {scrape_error}")
+            continue
+    
+    print(f"All Recommendation {all_recommendations}")
+    return jsonify({
+        'response': "Here are some personalized picks based on your past searches:",
+        'recommendations': all_recommendations
+    }), 200
+    
 if __name__ == '__main__':
     app.run(debug=True)
