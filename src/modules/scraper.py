@@ -74,7 +74,7 @@ def searchWalmart(query, df_flag, currency):
     for res in results:
         titles, prices, links = (
             res.select("span.lh-title"),
-            res.select("div.lh-copy"),
+            res.select("div[data-automation-id='product-price'] span.w_iUH7"),
             res.select("a")
         )
         ratings = res.findAll("span", {"class": "w_iUH7"}, text=pattern)
