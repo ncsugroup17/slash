@@ -355,7 +355,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       <Navbar username={username} />
       <ToastList />
       <main className="flex-1 container max-w-7xl mx-auto p-4">
