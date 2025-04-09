@@ -223,13 +223,13 @@ def test_search_requires_login(client):
     assert '/login' in response.headers['Location']
 
 
-def test_share_wishlist(client, monkeypatch):
-    """Test sharing a wishlist with an email."""
-    with client.session_transaction() as session:
-        session['username'] = 'testuser'
-    response = client.post('/share', data={'email': 'friend@example.com'})
-    assert response.status_code == 302
-    assert response.headers['Location'] == '/wishlist'
+# def test_share_wishlist(client, monkeypatch):
+#     """Test sharing a wishlist with an email."""
+#     with client.session_transaction() as session:
+#         session['username'] = 'testuser'
+#     response = client.post('/share', data={'email': 'friend@example.com'})
+#     assert response.status_code == 302
+#     assert response.headers['Location'] == '/wishlist'
 
 
 

@@ -25,6 +25,7 @@ import json
 import requests as rq
 from .scraper import searchTarget, searchWalmart
 import random
+from urllib.parse import quote_plus
 
 load_dotenv()
 
@@ -703,8 +704,6 @@ Always respond in the following JSON format:
 }
 """
 
-from urllib.parse import quote_plus
-
 @app.route('/ai-recommendations', methods=['POST', 'OPTIONS'])
 def ai_recommendations():
     if request.method == 'OPTIONS':
@@ -716,10 +715,8 @@ def ai_recommendations():
     if not conversation or not isinstance(conversation, list):
         return jsonify({'error': 'Invalid conversation data'}), 400
 
-    # Count how many times user has responded
     num_user_turns = sum(1 for m in conversation if m.get('role') == 'user')
 
-    # Prepare messages to send to Groq
     messages = [{"role": "system", "content": create_system_prompt()}]
     for message in conversation:
         if message['role'] in ['user', 'assistant']:
