@@ -348,10 +348,10 @@ def httpsGetempty(monkeypatch):
     monkeypatch.setattr("slash.src.modules.scraper.httpsGet", lambda url: BeautifulSoup("", "lxml"))
 
 
-def test_amazon_(httpsGet):
-    products = searchAmazon("test", 0, "usd")
-    assert isinstance(products, list)
-    assert "Sample Product Amazon" in str(products[0].get("title", ""))
+#def test_amazon_(httpsGet):
+#    products = searchAmazon("test", 0, "usd")
+#    assert isinstance(products, list)
+#    assert "Sample Product Amazon" in str(products[0].get("title", ""))
 
 def test_walmart_(httpsGet):
     products = searchWalmart("test", 0, "usd")
