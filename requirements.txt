@@ -24,6 +24,9 @@ Flask-PyMongo==2.3.0
 Flask-WTF==0.15.1
 google-auth==2.38.0
 google-auth-httplib2==0.2.0
+pytest-cov
+flask-cors
+selenium==4.21.0
 google-auth-oauthlib==1.2.1
 httplib2==0.22.0
 idna==3.2
