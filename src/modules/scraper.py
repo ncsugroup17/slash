@@ -12,6 +12,9 @@ import requests
 import os
 import re
 import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 from ebaysdk.finding import Connection
@@ -36,35 +39,70 @@ def httpsGet(URL):
         'Upgrade-Insecure-Requests': '1',
         'Cache-Control': 'no-cache'
     }
-    response = SESSION.get(URL, headers=headers, allow_redirects=False)
+    response = SESSION.get(URL, headers=headers, allow_redirects=True)
+    print("Status Code:", response.status_code)
+    if response.status_code != 200:
+        print("Likely redirected or blocked.")
+        with open("amazon_response_debug.html", "wb") as f:
+            f.write(response.content)
+        return None
     # Parse once using the fast "lxml" parser.
     return BeautifulSoup(response.content, "lxml")
 
+def seleniumGetAmazonHTML(query):
+    options = Options()
+    options.add_argument("--headless")  # Run in background
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+
+    driver = webdriver.Chrome(options=options)
+    url = f"https://www.amazon.com/s?k={query}"
+    driver.get(url)
+
+    # Wait for page to load (you may need to tune this)
+    #time.sleep(2)
+
+    html = driver.page_source
+    driver.quit()
+    return BeautifulSoup(html, "lxml")
 
 def searchAmazon(query, df_flag, currency):
+    print("Searching Amazon...")
     query = formatSearchQuery(query)
-    URL = f"https://www.amazon.com/s?k={query}"
-    page = httpsGet(URL)
-    results = page.findAll("div", {"data-component-type": "s-search-result"})
+    soup = seleniumGetAmazonHTML(query)
+
+    results = soup.findAll("div", {"data-component-type": "s-search-result"})
     products = []
+
     for res in results:
-        titles, prices, links = (
-            res.select("h2 a span"),
-            res.select("span.a-price span"),
-            res.select("h2 a.a-link-normal")
-        )
+        #titles = res.select("h2 a span")
+        titles = res.select("h2.a-size-small.a-spacing-none.a-color-base.s-line-clamp-2.a-text-normal span") # Updated selector
+        '''if titles:  # Check if the list is not empty
+           for title in titles:
+               product_title = title.text
+               print(product_title)
+        else:
+           print("No title found for this result") # Handle cases where no title is found'''
+
+        prices = res.select("span.a-price span.a-offscreen")
+
+        # Product Link
+        links = res.select("h2 a.a-link-normal")
         ratings = res.select("span.a-icon-alt")
         num_ratings = res.select("span.a-size-base")
         trending = res.select("span.a-badge-text")
         img_links = res.select("img.s-image")
+
         trending = trending[0] if trending else None
         product = formatResult("amazon", titles, prices, links, ratings,
-                                num_ratings, trending, df_flag, currency, img_links)
+                               num_ratings, trending, df_flag, currency, img_links)
         products.append(product)
+
     return products
 
-
 def searchWalmart(query, df_flag, currency):
+    print("Searching Walmart...")
     query = formatSearchQuery(query)
     URL = f"https://www.walmart.com/search?q={query}"
     page = httpsGet(URL)
@@ -143,6 +181,7 @@ def target_scraper(link):
 
 
 def searchEtsy(query, df_flag, currency):
+    print("Searching Etsy...")
     query = formatSearchQuery(query)
     url = f"https://www.etsy.com/search?q={query}"
     headers = {
@@ -169,6 +208,7 @@ def searchEtsy(query, df_flag, currency):
 
 
 def searchGoogleShopping(query, df_flag, currency):
+    print("Searching Google Shopping...")
     query = formatSearchQuery(query)
     URL = f"https://www.google.com/search?tbm=shop&q={query}"
     page = httpsGet(URL)
@@ -199,6 +239,7 @@ def searchGoogleShopping(query, df_flag, currency):
 
 
 def searchBJs(query, df_flag, currency):
+    print("Searching BJs...")
     query = formatSearchQuery(query)
     URL = f"https://www.bjs.com/search/{query}"
     page = httpsGet(URL)
@@ -223,6 +264,7 @@ def searchBJs(query, df_flag, currency):
 
 
 def searchEbay(query, df_flag, currency):
+    print("Searching eBay...")
     EBAY_APP = 'BradleyE-slash-PRD-2ddd2999f-2ae39cfa'
     try:
         api = Connection(appid=EBAY_APP, config_file=None, siteid='EBAY-US')
@@ -247,6 +289,7 @@ def searchEbay(query, df_flag, currency):
 
 
 def searchTarget(query, df_flag, currency):
+    print("Searching Target...")
     # Try the Target API first, but have fallbacks ready
     try:
         # First attempt with the API
@@ -372,6 +415,7 @@ def searchTarget(query, df_flag, currency):
 
 
 def searchBestbuy(query, df_flag, currency):
+    print("Searching Bestbuy...")
     query = formatSearchQuery(query)
     URL = f"https://www.bestbuy.com/site/searchpage.jsp?st={query}"
     page = httpsGet(URL)
@@ -446,14 +490,14 @@ def driver(product, currency, num=None, df_flag=0, csv=False, cd=None, ui=False,
     # Launch all scrapers in parallel
     with ThreadPoolExecutor(max_workers=16) as executor:
         futures = []
-        futures.append(executor.submit(safe_search, searchAmazon, product, df_flag, currency, 0))
-        futures.append(executor.submit(safe_search, searchWalmart, product, df_flag, currency, 1))
-        futures.append(executor.submit(safe_search, searchEtsy, product, df_flag, currency, 2))
-        futures.append(executor.submit(safe_search, searchGoogleShopping, product, df_flag, currency, 3))
-        futures.append(executor.submit(safe_search, searchBJs, product, df_flag, currency, 4))
-        futures.append(executor.submit(safe_search, searchEbay, product, df_flag, currency, 5))
+        futures.append(executor.submit(safe_search, searchWalmart, product, df_flag, currency, 0))
+        futures.append(executor.submit(safe_search, searchAmazon, product, df_flag, currency, 1))
+        #futures.append(executor.submit(safe_search, searchEtsy, product, df_flag, currency, 2))
+        #futures.append(executor.submit(safe_search, searchGoogleShopping, product, df_flag, currency, 3))
+        #futures.append(executor.submit(safe_search, searchBJs, product, df_flag, currency, 4))
+        #futures.append(executor.submit(safe_search, searchEbay, product, df_flag, currency, 5))
         futures.append(executor.submit(safe_search, searchBestbuy, product, df_flag, currency, 6))
-        futures.append(executor.submit(safe_search, searchTarget, product, df_flag, currency, 7))
+        #futures.append(executor.submit(safe_search, searchTarget, product, df_flag, currency, 7))
         
         # Wait for all futures to complete
         for future in futures:

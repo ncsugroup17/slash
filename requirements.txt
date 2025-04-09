@@ -16,3 +16,4 @@ google-auth-oauthlib==1.2.1
 google-auth-httplib2==0.2.0
 pytest-cov
 flask-cors
+selenium==4.21.0
