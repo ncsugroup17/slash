@@ -418,7 +418,7 @@ export default function SearchPage() {
           
           {/* Only show results when not searching and there are results */}
           {!isSearching && results.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {results.map((product, index) => {
                 // Debug log - can be removed in production
                 console.log(`Product ${index}:`, product);
