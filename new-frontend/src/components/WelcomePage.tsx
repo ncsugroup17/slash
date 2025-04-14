@@ -9,7 +9,7 @@ const WelcomePage: React.FC = () => {
         <button className="login-button">Login</button>
       </div>
     </div>
-  );
+  ); 
 };
 
 export default WelcomePage;
