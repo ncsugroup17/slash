@@ -64,7 +64,7 @@ export default function Home() {
             <Input 
               type="text" 
               name="product_name" 
-              placeholder="What are you looking for?" 
+              placeholder="What's on your mind today?" 
               className="flex-1" 
             />
             <Button type="submit">
