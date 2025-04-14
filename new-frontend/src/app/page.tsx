@@ -51,7 +51,7 @@ export default function Home() {
             Slash
           </h1>
           <p className="text-xl text-muted-foreground max-w-[700px]">
-            Elevating Your Shopping Experience, All you need is One Comparison.
+            Elevating Your Shopping Experience, All you need is One Comparison. Shop to until your heart's content.
           </p>
         </div>
 
