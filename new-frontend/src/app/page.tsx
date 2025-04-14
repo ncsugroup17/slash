@@ -47,7 +47,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
       <div className="container max-w-4xl px-4 py-8">
         <div className="flex flex-col items-center text-center mb-12">
-          <h1 className="text-5xl font-bold tracking-tighter mb-4">
+          <h1 className="text-5xl font-bold tracking-tighter mb-4 bg-gradient-to-r from-yellow-400 to-blue-600 bg-clip-text text-transparent">
             Slash
           </h1>
           <p className="text-xl text-muted-foreground max-w-[700px]">
@@ -76,12 +76,9 @@ export default function Home() {
             <Link href="/login">
               <Button variant="outline">Login</Button>
             </Link>
-            <a href={`${BACKEND_URL}/login/google?redirect_uri=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin + '/search') : 'http://localhost:3000/search'}`}>
-              <Button>Login with Google</Button>
-            </a>
           </div>
         </div>
       </div>
     </main>
   )
-} 
+}
