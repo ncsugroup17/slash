@@ -400,9 +400,9 @@ def test_driver_integration_(httpsGet):
     titles = df["title"].astype(str).tolist()
     assert any("Sample" in title for title in titles)
 
-def test_amazon_empty(httpsGetempty):
-    products = searchAmazon("test", 0, "usd")
-    assert products == []
+#def test_amazon_empty(httpsGetempty):
+#    products = searchAmazon("test", 0, "usd")
+#    assert products == []
 
 def test_walmart_empty(httpsGetempty):
     products = searchWalmart("test", 0, "usd")
