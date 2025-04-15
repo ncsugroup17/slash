@@ -27,52 +27,63 @@ Slash is a powerful tool designed to scrape leading e-commerce websites to find 
 
 # :rocket: Quick Guide
 
-1. Access the Github repository from your computer. 
- - First, pre-install [git](https://git-scm.com/) on  your machine. 
- - Then, clone the repo using the following command:
- ```
- git clone https://github.com/DillonMichels/slash
- ```
- * Finally, ```cd``` into the local repository.
-```
+1. Clone the repository and navigate to it:
+```bash
+git clone https://github.com/DillonMichels/slash
 cd slash
 ```
-2. Install the ```requirements.txt```. 
-- This project uses Python 3, so make sure that [Python](https://www.python.org/downloads/) and [Pip](https://pip.pypa.io/en/stable/installation/) are preinstalled.
-- Install the ```requirements.txt``` file using pip.
-```
-pip3 install -r requirements.txt
-```
-3. Running the program
 
-- Set the environmental variable using either of the following commands:
- ```
-MAC
-export FLASK_APP=./src/modules/app
-flask run
-
-Windows Command Prompt
-set FLASK_APP=.\src\modules\app 
-flask run
-
-Windows Powershell
-$Env:FLASK_APP='.\src\modules\app'
-flask run
+2. Install the backend dependencies:
+```bash
+pip install -r requirements.txt
 ```
 
-4. Once flask is running, open your internet browser and type ```http://127.0.0.1:5000/``` into the search bar.
+3. Start the backend server:
+```bash
+python run.py --frontend-url http://localhost:3000
+```
 
-<p>
- 
-# :dizzy: What's New? (Project 2 Updates)
+4. Set up the frontend (optional - for modern UI):
+```bash
+cd new-frontend
+npm install --legacy-peer-deps
+npm run dev
+```
 
-Updated to use a Database, testing of the Database, Wishlist, and faster Web Scraper times.
+5. Access the application:
+   - Traditional UI: Open `http://127.0.0.1:5000/` in your browser
+   - Modern UI (Next.js): Open `http://localhost:3000/` in your browser
 
+# :computer: Available UIs
+
+## Traditional UI
+
+The original Flask-based UI is available at `http://127.0.0.1:5000/` when running the Flask backend. This UI provides access to all core features including product search, filtering, and wishlist management.
+
+## Modern UI (Next.js)
+
+A new, modern frontend built with Next.js is available in the `new-frontend` directory. This UI features:
+
+- Responsive design for all devices
+- Improved user experience with real-time feedback
+- Modern UI components with ShadCN
+- Streamlined search and wishlist management
+- Seamless integration with the Flask backend
+
+To use the modern UI, follow the setup instructions for the frontend in the Quick Guide.
+
+# :dizzy: What's New?
+
+- Modern Next.js frontend with improved UX
+- Enhanced backend with database integration
+- Wishlist functionality for saving favorite deals
+- AI-powered product recommendations
+- Faster web scraper implementation
+- Improved authentication with Google OAuth
 
 ![alt text](/src/modules/static/images/wishlist.png)
 
-:sparkles: Contributors
----
+# :sparkles: Contributors
 <table>
   <tr>
     <td align="center"><a href="https://github.com/Mohsen-Esfandyari"><img src="https://avatars.githubusercontent.com/u/166367760?v=4" width="75px;" alt=""/><br /><sub><b>Mohsen-Esfandyari</b></sub></a></td>
@@ -81,11 +92,11 @@ Updated to use a Database, testing of the Database, Wishlist, and faster Web Scr
   </tr>
 </table>
 
-## Running the Application
+# :gear: Advanced Configuration
 
-### Backend (Flask)
+## Backend (Flask)
 
-You can run the Flask backend with proper URL configuration using the `run.py` script:
+The Flask backend can be configured with various options:
 
 ```bash
 # Basic run at port 5000
@@ -101,20 +112,27 @@ python run.py --redirect-uri http://localhost:5000/callback
 python run.py --host localhost --port 5000 --frontend-url http://localhost:3000 --debug
 ```
 
-The application now dynamically determines URLs based on:
+The application dynamically determines URLs based on:
 1. Environment variables if provided
 2. Request information (headers, referrers)
 3. Smart fallbacks with sensible defaults
 
 This approach avoids hardcoded URLs and makes the application work seamlessly with both the original and new frontends.
 
-### Frontend (Next.js)
-
-Run the Next.js frontend:
+## Advanced Frontend Commands (Next.js)
 
 ```bash
-cd new-frontend
+# Run development server
 npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm run start
+
+# Run tests
+npm run test
 ```
 
-The Next.js application will be available at http://localhost:3000.
+The Next.js application will be available at http://localhost:3000 by default.
