@@ -33,6 +33,8 @@ jobs:
       working-directory: ./new-frontend
       run: |
         npm install --legacy-peer-deps --ignore-scripts
+        npm install --save-dev @testing-library/dom
+
 
     - name: Run tests (always pass)
       working-directory: ./new-frontend
