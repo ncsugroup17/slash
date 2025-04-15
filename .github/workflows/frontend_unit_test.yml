@@ -32,7 +32,7 @@ jobs:
     - name: Install dependencies (frontend)
       working-directory: ./new-frontend
       run: |
-        npm install --legacy-peer-deps
+        npm install --legacy-peer-deps --ignore-scripts
 
     - name: Run tests (always pass)
       working-directory: ./new-frontend
