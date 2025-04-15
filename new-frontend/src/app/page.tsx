@@ -56,7 +56,7 @@ export default function Home() {
         </div>
 
         <div className="grid gap-6">
-          <form 
+          {/*<form 
             className="flex w-full max-w-lg mx-auto items-center space-x-2"
             action="/search"
             method="GET"
@@ -71,6 +71,7 @@ export default function Home() {
               Search
             </Button>
           </form>
+          */}
 
           <div className="flex justify-center space-x-4">
             <Link href="/login">

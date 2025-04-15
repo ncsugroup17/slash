@@ -1,0 +1,43 @@
+/* Apply striped background */
+.welcome-page {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Full viewport height */
+    background: repeating-linear-gradient(
+        45deg,
+        white,
+        white 20px,
+        black 20px,
+        black 40px
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Center container */
+.welcome-container {
+    text-align: center;
+}
+
+/* Heading styling */
+h1 {
+    font-size: 2.5em;
+    color: black;
+}
+
+/* Login button styling */
+.login-button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em; 
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}
