@@ -75,10 +75,10 @@ To use the modern UI, follow the setup instructions for the frontend in the Quic
 # :dizzy: What's New?
 
 - Modern Next.js frontend with improved UX
-- Enhanced backend with database integration
+- Enhanced and integrated backend with database
 - Wishlist functionality for saving favorite deals
 - AI-powered product recommendations
-- Faster web scraper implementation
+- Faster and more accirate web scraper
 - Improved authentication with Google OAuth
 
 ![alt text](/src/modules/static/images/wishlist.png)
@@ -89,6 +89,12 @@ To use the modern UI, follow the setup instructions for the frontend in the Quic
     <td align="center"><a href="https://github.com/Mohsen-Esfandyari"><img src="https://avatars.githubusercontent.com/u/166367760?v=4" width="75px;" alt=""/><br /><sub><b>Mohsen-Esfandyari</b></sub></a></td>
     <td align="center"><a href="https://github.com/ali-f-alfa"><img src="https://avatars.githubusercontent.com/u/45769531?v=4" width="75px;" alt=""/><br /><sub><b>Ali Farahat</b></sub></a></td>
     <td align="center"><a href="https://github.com/DillonMichels"><img src="https://avatars.githubusercontent.com/u/88557889?v=4" width="75px;" alt=""/><br /><sub><b>Dillon Michels</b></sub></a></td>
+  </tr>
+    <tr>
+    <td align="center"><a href="https://github.com/rymikula"><img src="https://avatars.githubusercontent.com/u/194296512?v=4" width="75px;" alt=""/><br /><sub><b>Mohsen-Esfandyari</b></sub></a></td>
+    <td align="center"><a href="https://github.com/MesekerWK"><img src="https://avatars.githubusercontent.com/u/63201911?v=4" width="75px;" alt=""/><br /><sub><b>Ali Farahat</b></sub></a></td>
+    <td align="center"><a href="https://github.com/ONeal2467"><img src="https://avatars.githubusercontent.com/u/89427296?v=4" width="75px;" alt=""/><br /><sub><b>Dillon Michels</b></sub></a></td>
+    <td align="center"><a href="https://github.com/SyntaxErrorThapa"><img src="https://avatars.githubusercontent.com/u/125596457?v=4" width="75px;" alt=""/><br /><sub><b>Dillon Michels</b></sub></a></td>
   </tr>
 </table>
 
