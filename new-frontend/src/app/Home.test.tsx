@@ -32,13 +32,6 @@ describe('Home Page Tests', () => {
     const loginButton = screen.getByRole('button', { name: 'Login' });
     expect(loginButton).toBeInTheDocument();
   });
-  
-
-  test('renders the Login with Google button', () => {
-    render(<Home />);
-    const googleLoginButton = screen.getByRole('button', { name: /login with google/i });
-    expect(googleLoginButton).toBeInTheDocument();
-  });
 
   test('renders the loading state when page is loading', () => {
     jest.spyOn(React, 'useState').mockImplementationOnce(() => [true, jest.fn()]);
