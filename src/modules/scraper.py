@@ -12,6 +12,9 @@ import requests
 import os
 import re
 import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 from ebaysdk.finding import Connection
@@ -36,35 +39,70 @@ def httpsGet(URL):
         'Upgrade-Insecure-Requests': '1',
         'Cache-Control': 'no-cache'
     }
-    response = SESSION.get(URL, headers=headers, allow_redirects=False)
+    response = SESSION.get(URL, headers=headers, allow_redirects=True)
+    print("Status Code:", response.status_code)
+    if response.status_code != 200:
+        print("Likely redirected or blocked.")
+        with open("amazon_response_debug.html", "wb") as f:
+            f.write(response.content)
+        return None
     # Parse once using the fast "lxml" parser.
     return BeautifulSoup(response.content, "lxml")
 
+def seleniumGetAmazonHTML(query):
+    options = Options()
+    options.add_argument("--headless")  # Run in background
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+
+    driver = webdriver.Chrome(options=options)
+    url = f"https://www.amazon.com/s?k={query}"
+    driver.get(url)
+
+    # Wait for page to load (you may need to tune this)
+    #time.sleep(2)
+
+    html = driver.page_source
+    driver.quit()
+    return BeautifulSoup(html, "lxml")
 
 def searchAmazon(query, df_flag, currency):
+    print("Searching Amazon...")
     query = formatSearchQuery(query)
-    URL = f"https://www.amazon.com/s?k={query}"
-    page = httpsGet(URL)
-    results = page.findAll("div", {"data-component-type": "s-search-result"})
+    soup = seleniumGetAmazonHTML(query)
+
+    results = soup.findAll("div", {"data-component-type": "s-search-result"})
     products = []
+
     for res in results:
-        titles, prices, links = (
-            res.select("h2 a span"),
-            res.select("span.a-price span"),
-            res.select("h2 a.a-link-normal")
-        )
+        #titles = res.select("h2 a span")
+        titles = res.select("h2.a-size-small.a-spacing-none.a-color-base.s-line-clamp-2.a-text-normal span") # Updated selector
+        '''if titles:  # Check if the list is not empty
+           for title in titles:
+               product_title = title.text
+               print(product_title)
+        else:
+           print("No title found for this result") # Handle cases where no title is found'''
+
+        prices = res.select("span.a-price span.a-offscreen")
+
+        # Product Link
+        links = res.select("h2 a.a-link-normal")
         ratings = res.select("span.a-icon-alt")
         num_ratings = res.select("span.a-size-base")
         trending = res.select("span.a-badge-text")
         img_links = res.select("img.s-image")
+
         trending = trending[0] if trending else None
         product = formatResult("amazon", titles, prices, links, ratings,
-                                num_ratings, trending, df_flag, currency, img_links)
+                               num_ratings, trending, df_flag, currency, img_links)
         products.append(product)
+
     return products
 
-
 def searchWalmart(query, df_flag, currency):
+    print("Searching Walmart...")
     query = formatSearchQuery(query)
     URL = f"https://www.walmart.com/search?q={query}"
     page = httpsGet(URL)
@@ -74,7 +112,7 @@ def searchWalmart(query, df_flag, currency):
     for res in results:
         titles, prices, links = (
             res.select("span.lh-title"),
-            res.select("div.lh-copy"),
+            res.select("div[data-automation-id='product-price'] span.w_iUH7"),
             res.select("a")
         )
         ratings = res.findAll("span", {"class": "w_iUH7"}, text=pattern)
@@ -143,6 +181,7 @@ def target_scraper(link):
 
 
 def searchEtsy(query, df_flag, currency):
+    print("Searching Etsy...")
     query = formatSearchQuery(query)
     url = f"https://www.etsy.com/search?q={query}"
     headers = {
@@ -169,6 +208,7 @@ def searchEtsy(query, df_flag, currency):
 
 
 def searchGoogleShopping(query, df_flag, currency):
+    print("Searching Google Shopping...")
     query = formatSearchQuery(query)
     URL = f"https://www.google.com/search?tbm=shop&q={query}"
     page = httpsGet(URL)
@@ -199,6 +239,7 @@ def searchGoogleShopping(query, df_flag, currency):
 
 
 def searchBJs(query, df_flag, currency):
+    print("Searching BJs...")
     query = formatSearchQuery(query)
     URL = f"https://www.bjs.com/search/{query}"
     page = httpsGet(URL)
@@ -223,6 +264,7 @@ def searchBJs(query, df_flag, currency):
 
 
 def searchEbay(query, df_flag, currency):
+    print("Searching eBay...")
     EBAY_APP = 'BradleyE-slash-PRD-2ddd2999f-2ae39cfa'
     try:
         api = Connection(appid=EBAY_APP, config_file=None, siteid='EBAY-US')
@@ -247,64 +289,133 @@ def searchEbay(query, df_flag, currency):
 
 
 def searchTarget(query, df_flag, currency):
-    api_url = 'https://redsky.target.com/redsky_aggregations/v1/web/plp_search_v1'
-    page = '/s/' + query
-    params = {
-        'key': 'ff457966e64d5e877fdbad070f276d18ecec4a01',
-        'channel': 'WEB',
-        'count': '24',
-        'default_purchasability_filter': 'false',
-        'include_sponsored': 'true',
-        'keyword': query,
-        'offset': '0',
-        'page': page,
-        'platform': 'desktop',
-        'pricing_store_id': '3991',
-        'useragent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0',
-        'visitor_id': 'AAA',
-    }
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Cache-Control': 'no-cache'
-    }
-    response = SESSION.get(api_url, headers=headers, params=params)
-    if response.status_code != 200:
-        print(f"Error: Received status code {response.status_code} from {api_url}")
-        print(f"Response content: {response.text}")
-        return []
+    print("Searching Target...")
+    # Try the Target API first, but have fallbacks ready
     try:
+        # First attempt with the API
+        api_url = 'https://redsky.target.com/redsky_aggregations/v1/web/plp_search_v1'
+        page = '/s/' + query
+        params = {
+            'key': 'ff457966e64d5e877fdbad070f276d18ecec4a01',
+            'channel': 'WEB',
+            'count': '24',
+            'default_purchasability_filter': 'false',
+            'include_sponsored': 'true',
+            'keyword': query,
+            'offset': '0',
+            'page': page,
+            'platform': 'desktop',
+            'pricing_store_id': '3991',
+            'useragent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0',
+            'visitor_id': 'AAA',
+        }
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'no-cache'
+        }
+        response = SESSION.get(api_url, headers=headers, params=params)
+        
+        # Check if we got rate limited (410 Gone or 429 Too Many Requests)
+        if response.status_code in [410, 429]:
+            print(f"Rate limited by Target API (status {response.status_code}). Using fallback scraping method.")
+            raise Exception("Rate limited")
+            
+        # Check for other response errors
+        if response.status_code != 200:
+            print(f"Error: Received status code {response.status_code} from {api_url}")
+            print(f"Response content: {response.text}")
+            raise Exception(f"API error: {response.status_code}")
+            
+        # Parse the JSON response    
         data = response.json()
+        
+        # Extract product data
+        products = []
+        for p in data.get('data', {}).get('search', {}).get('products', []):
+            titles = p['item']['product_description']['title']
+            prices = '$' + str(p['price']['reg_retail'])
+            links = p['item']['enrichment']['buy_url']
+            img_link = p['item']['enrichment']['images']['primary_image_url']
+            try:
+                ratings = p['ratings_and_reviews']['statistics']['rating']['average']
+            except KeyError:
+                ratings = None
+            try:
+                num_ratings = p['ratings_and_reviews']['statistics']['rating']['count']
+            except KeyError:
+                num_ratings = None
+            trending = None
+            product = formatResult("target", titles, prices, links, ratings,
+                                   num_ratings, trending, df_flag, currency, img_link)
+            products.append(product)
+        return products
+        
     except Exception as e:
-        print(f"Error: Unable to parse JSON response from {api_url}: {e}")
-        print(f"Response content: {response.text}")
-        return []
-    products = []
-    for p in data.get('data', {}).get('search', {}).get('products', []):
-        titles = p['item']['product_description']['title']
-        prices = '$' + str(p['price']['reg_retail'])
-        links = p['item']['enrichment']['buy_url']
-        img_link = p['item']['enrichment']['images']['primary_image_url']
+        # If the API call failed, try web scraping as fallback
+        print(f"Target API error: {str(e)}. Attempting fallback using web scraping.")
         try:
-            ratings = p['ratings_and_reviews']['statistics']['rating']['average']
-        except KeyError:
-            ratings = None
-        try:
-            num_ratings = p['ratings_and_reviews']['statistics']['rating']['count']
-        except KeyError:
-            num_ratings = None
-        trending = None
-        product = formatResult("target", titles, prices, links, ratings,
-                                num_ratings, trending, df_flag, currency, img_link)
-        products.append(product)
-    return products
+            # Fallback to scraping the Target website directly
+            query = formatSearchQuery(query)
+            URL = f"https://www.target.com/s?searchTerm={query}"
+            page = httpsGet(URL)
+            
+            # Extract products using HTML parsing
+            products = []
+            results = page.select("li[data-test='product-list-item']")
+            
+            for res in results:
+                try:
+                    title_elem = res.select_one("a[data-test='product-title']")
+                    price_elem = res.select_one("span[data-test='current-price']")
+                    
+                    if not title_elem or not price_elem:
+                        continue
+                        
+                    title = title_elem.text.strip()
+                    price = price_elem.text.strip()
+                    link = "https://www.target.com" + title_elem.get("href", "")
+                    
+                    # Try to get image
+                    img_elem = res.select_one("img")
+                    img_link = img_elem.get("src", "") if img_elem else ""
+                    
+                    product = {
+                        "title": title,
+                        "price": price,
+                        "link": link,
+                        "rating": None,  # Ratings are harder to get from HTML
+                        "num_ratings": None,
+                        "website": "target",
+                        "image_url": img_link
+                    }
+                    
+                    if df_flag:
+                        if product["price"] and product["price"].startswith("$"):
+                            try:
+                                product["price_float"] = float(product["price"][1:].replace(",", ""))
+                            except:
+                                product["price_float"] = 0
+                    
+                    products.append(product)
+                except Exception as item_error:
+                    print(f"Error parsing Target product: {str(item_error)}")
+                    continue
+                    
+            return products
+            
+        except Exception as scrape_error:
+            print(f"Target fallback scraping also failed: {str(scrape_error)}")
+            # Return empty list on total failure
+            return []
 
 
 def searchBestbuy(query, df_flag, currency):
+    print("Searching Bestbuy...")
     query = formatSearchQuery(query)
     URL = f"https://www.bestbuy.com/site/searchpage.jsp?st={query}"
     page = httpsGet(URL)
@@ -365,17 +476,42 @@ def driver(product, currency, num=None, df_flag=0, csv=False, cd=None, ui=False,
     else displays the result table in the terminal based on the args entered by the user.
     This version uses ThreadPoolExecutor with a global requests.Session for faster concurrent scraping.
     """
+    # Initialize results container for each source
+    results = [[] for _ in range(8)]
+    
+    # Define a wrapper function to handle exceptions in each scraper
+    def safe_search(search_func, product, df_flag, currency, index):
+        try:
+            results[index] = search_func(product, df_flag, currency)
+        except Exception as e:
+            print(f"Error in {search_func.__name__}: {str(e)}")
+            results[index] = []  # Empty list on failure
+    
+    # Launch all scrapers in parallel
     with ThreadPoolExecutor(max_workers=16) as executor:
         futures = []
-        futures.append(executor.submit(searchAmazon, product, df_flag, currency))
-        futures.append(executor.submit(searchWalmart, product, df_flag, currency))
-        futures.append(executor.submit(searchEtsy, product, df_flag, currency))
-        futures.append(executor.submit(searchGoogleShopping, product, df_flag, currency))
-        futures.append(executor.submit(searchBJs, product, df_flag, currency))
-        futures.append(executor.submit(searchEbay, product, df_flag, currency))
-        futures.append(executor.submit(searchBestbuy, product, df_flag, currency))
-        futures.append(executor.submit(searchTarget, product, df_flag, currency))
-        results = [future.result() for future in futures]
+        futures.append(executor.submit(safe_search, searchWalmart, product, df_flag, currency, 0))
+        futures.append(executor.submit(safe_search, searchAmazon, product, df_flag, currency, 1))
+        #futures.append(executor.submit(safe_search, searchEtsy, product, df_flag, currency, 2))
+        #futures.append(executor.submit(safe_search, searchGoogleShopping, product, df_flag, currency, 3))
+        #futures.append(executor.submit(safe_search, searchBJs, product, df_flag, currency, 4))
+        #futures.append(executor.submit(safe_search, searchEbay, product, df_flag, currency, 5))
+        futures.append(executor.submit(safe_search, searchBestbuy, product, df_flag, currency, 6))
+        #futures.append(executor.submit(safe_search, searchTarget, product, df_flag, currency, 7))
+        
+        # Wait for all futures to complete
+        for future in futures:
+            try:
+                future.result()  # This will re-raise any exceptions from the thread
+            except Exception as e:
+                print(f"Error in scraper thread: {str(e)}")
+
+    # Check if we have any results at all
+    total_results = sum(len(r) for r in results)
+    if total_results == 0:
+        print("Warning: No results found from any source. Check your search query or network connectivity.")
+    else:
+        print(f"Found a total of {total_results} results across all sources")
 
     if not ui:
         all_results = []
@@ -386,6 +522,12 @@ def driver(product, currency, num=None, df_flag=0, csv=False, cd=None, ui=False,
                 result_condensed.extend(product_list[:num])
             else:
                 result_condensed.extend(product_list)
+        
+        # Make sure we have results before creating DataFrames
+        if not result_condensed:
+            print("No results to display")
+            return pd.DataFrame()  # Return empty DataFrame
+            
         result_condensed = pd.DataFrame.from_dict(result_condensed, orient="columns")
         all_results = pd.DataFrame.from_dict(all_results, orient="columns")
         if not currency:
@@ -399,14 +541,14 @@ def driver(product, currency, num=None, df_flag=0, csv=False, cd=None, ui=False,
         return result_condensed
     else:
         result_condensed = []
-        condense_helper(result_condensed, results[0], num)
-        condense_helper(result_condensed, results[1], num)
-        condense_helper(result_condensed, results[2], num)
-        condense_helper(result_condensed, results[3], num)
-        condense_helper(result_condensed, results[4], num)
-        condense_helper(result_condensed, results[5], num)
-        condense_helper(result_condensed, results[6], num)
-        condense_helper(result_condensed, results[7], num)
+        for i in range(8):
+            condense_helper(result_condensed, results[i], num)
+            
+        # Make sure we have results
+        if not result_condensed:
+            print("No results to display")
+            return []
+            
         if currency is not None:
             for p in result_condensed:
                 p["price"] = getCurrency(currency, p["price"])
