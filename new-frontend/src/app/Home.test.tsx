@@ -8,31 +8,38 @@ jest.mock('next/navigation', () => ({
   })),
 }));
 
+// Mock framer-motion to avoid animation issues in tests
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }) => <div {...props}>{children}</div>,
+    p: ({ children, ...props }) => <p {...props}>{children}</p>,
+  },
+  AnimatePresence: ({ children }) => <>{children}</>,
+}));
+
 import { render, screen } from '@testing-library/react';
 import Home from './page';
 import React from 'react';
 import '@testing-library/jest-dom';
 
 describe('Home Page Tests', () => {
-  test('renders the main heading "Slash"', () => {
+  test('renders the main heading "SLASH"', () => {
     render(<Home />);
-    const heading = screen.getByRole('heading', { name: /slash/i });
+    const heading = screen.getByRole('heading', { level: 1, name: /SLASH/i });
     expect(heading).toBeInTheDocument();
   });
 
   test('renders the subheading about shopping experience', () => {
     render(<Home />);
-    const subheading = screen.getByText(/elevating your shopping experience, all you need is one comparison\./i);
+    const subheading = screen.getByText(/elevating your shopping experience/i);
     expect(subheading).toBeInTheDocument();
   });
 
-  test('renders the Login button', () => {
+  test('renders the description text about finding deals', () => {
     render(<Home />);
-    // Use exact text matching instead of regex
-    const loginButton = screen.getByRole('button', { name: 'Login' });
-    expect(loginButton).toBeInTheDocument();
+    const description = screen.getByText(/find the best deals across multiple stores/i);
+    expect(description).toBeInTheDocument();
   });
-  
 
   test('renders the Login with Google button', () => {
     render(<Home />);
@@ -40,10 +47,28 @@ describe('Home Page Tests', () => {
     expect(googleLoginButton).toBeInTheDocument();
   });
 
+  test('renders feature cards with their titles', () => {
+    render(<Home />);
+    const fastComparisonTitle = screen.getByText(/fast comparison/i);
+    const saveFavoritesTitle = screen.getByText(/save favorites/i);
+    const smartRecommendationsTitle = screen.getByText(/smart recommendations/i);
+    
+    expect(fastComparisonTitle).toBeInTheDocument();
+    expect(saveFavoritesTitle).toBeInTheDocument();
+    expect(smartRecommendationsTitle).toBeInTheDocument();
+  });
+
   test('renders the loading state when page is loading', () => {
     jest.spyOn(React, 'useState').mockImplementationOnce(() => [true, jest.fn()]);
     render(<Home />);
     const loadingText = screen.getByText(/loading.../i);
     expect(loadingText).toBeInTheDocument();
+  });
+
+  test('renders the footer with copyright information', () => {
+    render(<Home />);
+    const currentYear = new Date().getFullYear();
+    const footerText = screen.getByText(new RegExp(`© ${currentYear} Slash - All rights reserved`, 'i'));
+    expect(footerText).toBeInTheDocument();
   });
 });
