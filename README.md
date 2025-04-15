@@ -3,21 +3,21 @@ Slash Your Spending, Not Your Style - Unleash the Best Deals!!
 
 <p align="center"><img width="500" src="./assets/Shop.gif"></p>
 
-[![GitHub license](https://img.shields.io/github/license/DillonMichels/slash)](https://github.com/DillonMichels/slash/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/ncsugroup17/slash)](https://github.com/ncsugroup17/slash/blob/main/LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14932526.svg)](https://doi.org/10.5281/zenodo.14932526)
 ![Github](https://img.shields.io/badge/language-python-red.svg)
-[![Pylint](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/pylint.yml)
-[![Python Application](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
-[![Running Code Coverage](https://github.com/DillonMichels/slash/actions/workflows/code_cov.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/code_cov.yml)
-[![OAuth and scrappers](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/python-package.yml)
-[![Python Style Checker](https://github.com/DillonMichels/slash/actions/workflows/style_checker.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/style_checker.yml)
-[![Format Check](https://github.com/DillonMichels/slash/actions/workflows/code_formatter.yml/badge.svg)](https://github.com/DillonMichels/slash/actions/workflows/code_formatter.yml)
+[![Pylint](https://github.com/ncsugroup17/slash/actions/workflows/pylint.yml/badge.svg)](https://github.com/ncsugroup17/slash/actions/workflows/pylint.yml)
+[![Python Application](https://github.com/ncsugroup17/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/ncsugroup17/slash/actions/workflows/python-package.yml)
+[![Running Code Coverage](https://github.com/ncsugroup17/slash/actions/workflows/code_cov.yml/badge.svg)](https://github.com/ncsugroup17/slash/actions/workflows/code_cov.yml)
+[![OAuth and scrappers](https://github.com/ncsugroup17/slash/actions/workflows/python-package.yml/badge.svg)](https://github.com/ncsugroup17/slash/actions/workflows/python-package.yml)
+[![Python Style Checker](https://github.com/ncsugroup17/slash/actions/workflows/style_checker.yml/badge.svg)](https://github.com/ncsugroup17/slash/actions/workflows/style_checker.yml)
+[![Format Check](https://github.com/ncsugroup17/slash/actions/workflows/code_formatter.yml/badge.svg)](https://github.com/ncsugroup17/slash/actions/workflows/code_formatter.yml)
 
-[![GitHub issues](https://img.shields.io/github/issues/DillonMichels/slash)](https://github.com/DillonMichels/slash/issues)
-[![Github closes issues](https://img.shields.io/github/issues-closed-raw/DillonMichels/slash)](https://github.com/DillonMichels/slash/issues?q=is%3Aissue+is%3Aclosed)
-[![Github closed pull requests](https://img.shields.io/github/issues-pr-closed/DillonMichels/slash)](https://github.com/DillonMichels/slash/pulls?q=is%3Apr+is%3Aclosed)
-<a href="https://github.com/DillonMichels/slash/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/DillonMichels/slash"></a>
-<a href="https://github.com/DillonMichels/slash/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/DillonMichels/slash"></a>
+[![GitHub issues](https://img.shields.io/github/issues/ncsugroup17/slash)](https://github.com/ncsugroup17/slash/issues)
+[![Github closes issues](https://img.shields.io/github/issues-closed-raw/ncsugroup17/slash)](https://github.com/ncsugroup17/slash/issues?q=is%3Aissue+is%3Aclosed)
+[![Github closed pull requests](https://img.shields.io/github/issues-pr-closed/ncsugroup17/slash)](https://github.com/ncsugroup17/slash/pulls?q=is%3Apr+is%3Aclosed)
+<a href="https://github.com/ncsugroup17/slash/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/ncsugroup17/slash"></a>
+<a href="https://github.com/ncsugroup17/slash/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/ncsugroup17/slash"></a>
 ![Discord](https://img.shields.io/discord/1162231656980168876)
 
 Slash is a powerful tool designed to scrape leading e-commerce websites to find the best deals on products you're searching for. It currently supports popular platforms including [Walmart](https://www.walmart.com/), [Target](https://www.target.com/), [BestBuy](https://www.bestbuy.com/),  [Amazon](https://www.amazon.com/), [Google Shopping](https://shopping.google.com/),  [BJs](https://www.bjs.com/),  [Etsy](https://www.etsy.com/), and [EBay](https://www.ebay.com/).
@@ -25,11 +25,15 @@ Slash is a powerful tool designed to scrape leading e-commerce websites to find 
 - **Easy**: Slash uses very easy commands to filter, sort and search your items
 - **Powerful**: Quickly alter the commands to get desired results
 
+# Demo video
+[![New Demo!](https://img.youtube.com/vi/_HhITI_dcVU/0.jpg)](https://youtu.be/_HhITI_dcVU?si=l7_4ijqguVYon99y)
+
+
 # :rocket: Quick Guide
 
 1. Clone the repository and navigate to it:
 ```bash
-git clone https://github.com/DillonMichels/slash
+git clone https://github.com/ncsugroup17/slash
 cd slash
 ```
 
@@ -88,7 +92,7 @@ To use the modern UI, follow the setup instructions for the frontend in the Quic
   <tr>
     <td align="center"><a href="https://github.com/Mohsen-Esfandyari"><img src="https://avatars.githubusercontent.com/u/166367760?v=4" width="75px;" alt=""/><br /><sub><b>Mohsen-Esfandyari</b></sub></a></td>
     <td align="center"><a href="https://github.com/ali-f-alfa"><img src="https://avatars.githubusercontent.com/u/45769531?v=4" width="75px;" alt=""/><br /><sub><b>Ali Farahat</b></sub></a></td>
-    <td align="center"><a href="https://github.com/DillonMichels"><img src="https://avatars.githubusercontent.com/u/88557889?v=4" width="75px;" alt=""/><br /><sub><b>Dillon Michels</b></sub></a></td>
+    <td align="center"><a href="https://github.com/ncsugroup17"><img src="https://avatars.githubusercontent.com/u/88557889?v=4" width="75px;" alt=""/><br /><sub><b>Dillon Michels</b></sub></a></td>
   </tr>
     <tr>
     <td align="center"><a href="https://github.com/rymikula"><img src="https://avatars.githubusercontent.com/u/194296512?v=4" width="75px;" alt=""/><br /><sub><b>Ryan Mikula</b></sub></a></td>
