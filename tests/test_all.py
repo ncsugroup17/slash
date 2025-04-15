@@ -223,13 +223,13 @@ def test_search_requires_login(client):
     assert '/login' in response.headers['Location']
 
 
-# def test_share_wishlist(client, monkeypatch):
-#     """Test sharing a wishlist with an email."""
-#     with client.session_transaction() as session:
-#         session['username'] = 'testuser'
-#     response = client.post('/share', data={'email': 'friend@example.com'})
-#     assert response.status_code == 302
-#     assert response.headers['Location'] == '/wishlist'
+def test_share_wishlist(client, monkeypatch):
+    """Test sharing a wishlist with an email."""
+    with client.session_transaction() as session:
+        session['username'] = 'testuser'
+    response = client.post('/share', data={'email': 'friend@example.com'})
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/wishlist'
 
 
 
@@ -348,10 +348,10 @@ def httpsGetempty(monkeypatch):
     monkeypatch.setattr("slash.src.modules.scraper.httpsGet", lambda url: BeautifulSoup("", "lxml"))
 
 
-#def test_amazon_(httpsGet):
-#    products = searchAmazon("test", 0, "usd")
-#    assert isinstance(products, list)
-#    assert "Sample Product Amazon" in str(products[0].get("title", ""))
+def test_amazon_(httpsGet):
+    products = searchAmazon("test", 0, "usd")
+    assert isinstance(products, list)
+    assert "Sample Product Amazon" in str(products[0].get("title", ""))
 
 def test_walmart_(httpsGet):
     products = searchWalmart("test", 0, "usd")
@@ -400,9 +400,9 @@ def test_driver_integration_(httpsGet):
     titles = df["title"].astype(str).tolist()
     assert any("Sample" in title for title in titles)
 
-#def test_amazon_empty(httpsGetempty):
-#    products = searchAmazon("test", 0, "usd")
-#    assert products == []
+def test_amazon_empty(httpsGetempty):
+    products = searchAmazon("test", 0, "usd")
+    assert products == []
 
 def test_walmart_empty(httpsGetempty):
     products = searchWalmart("test", 0, "usd")

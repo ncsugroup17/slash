@@ -5,7 +5,6 @@ Licensed under the MIT License.
 See the LICENSE file in the project root for the full license information.
 """
 
-import logging
 import os
 import pandas as pd
 import re
@@ -138,40 +137,35 @@ def wishlist_remove_list(email, wishlist_name, index):
 
 # Email and Price Update Functions
 
-def share_wishlist(email_sender, wishlist_name, email_receiver, wishlist_data):
+def share_wishlist(email_sender, wishlist_name, email_receiver):
     """
     Sends a user's wishlist via email to a specified recipient.
     """
-    try:
-        email_password = Config.EMAIL_PASS
-        subject = f"{email_sender}'s Wishlist from Slash"
+    wishlist_path = usr_dir(email_sender) / f"{wishlist_name}.csv"
+    if wishlist_path.exists():
+        try:
+            email_password = Config.EMAIL_PASS
+            subject = f'Slash wishlist of {email_sender}'
+            df = pd.read_csv(wishlist_path)
+            links_list = df['link'].astype(str).str.cat(sep=' ')
+            body = "\n".join([
+                f"{i}. {link}" for i, link in enumerate(links_list.split(), start=1)
+            ])
 
-        # Format wishlist items into an email-friendly format
-        body = "\n\n".join([
-            f"{i+1}. {item['title']}\n   Price: {item.get('price', 'N/A')}\n   Link: {item['url']}"
-            for i, item in enumerate(wishlist_data)
-        ])
+            em = EmailMessage()
+            em['From'] = email_sender
+            em['To'] = email_receiver
+            em['Subject'] = subject
+            em.set_content(body)
 
-        em = EmailMessage()
-        em['From'] = email_sender
-        em['To'] = email_receiver
-        em['Subject'] = subject
-        em.set_content(body)
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+                smtp.login(email_sender, email_password)
+                smtp.sendmail(email_sender, email_receiver, em.as_string())
 
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-            smtp.login(email_sender, email_password)
-            smtp.sendmail(email_sender, email_receiver, em.as_string())
-        
-        logging.info(f"Email sent to {email_receiver} from {email_sender}.")
-
-    except Exception as e:
-        logging.error(f"Failed to send email: {str(e)}")
-        return f"Failed to send email: {str(e)}"
-
+        except Exception:
+            return 'Failed to send email'
     return None
-
-
 
 
 def find_currency(price):
